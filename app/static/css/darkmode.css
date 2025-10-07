@@ -191,6 +191,17 @@ button#geo-btn, #favorite-btn {
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
+/* Specific override for the favorite button */
+#favorite-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--text-primary);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+#favorite-btn:hover {
+    transform: scale(1.1);
+    color: var(--text-secondary);
+}
 #favorites-list button {
     background-color: var(--bg-input);
     color: var(--text-primary);
