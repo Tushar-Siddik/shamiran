@@ -1,5 +1,5 @@
 from app.api import weather_api
-from app.utils import cache
+from app.utils import cache, moon_phase
 import requests
 
 # Helper to get AQI description and color
@@ -49,8 +49,19 @@ def get_weather_data(city):
         current = weather_api.get_current_weather(city)
         forecast = weather_api.get_forecast(city)
         
-        lat = current['coord']['lat']
-        lon = current['coord']['lon'] 
+        # lat = current['coord']['lat']
+        # lon = current['coord']['lon']
+        coord = current.get('coord', {})
+        lat = coord.get('lat')
+        lon = coord.get('lon') 
+        
+        # --- Moon Phase Integration ---
+        moon_data = None
+        try:
+            moon_data = moon_phase.get_moon_phase_data(current['name'], lat, lon, current['timezone'])
+        except Exception:
+            moon_data = None # Fail silently if moon data is not available
+        # --- End Moon Phase Integration ---
         
         # # --- DEBUGGING: PRINT THE RAW API RESPONSE ---
         # print("--- RAW API RESPONSE FOR CURRENT WEATHER ---")
@@ -111,6 +122,7 @@ def get_weather_data(city):
             "forecast": forecast,
             "aqi": aqi_data,
             "uvi": uvi,
+            "moon": moon_data,
             "error": None
         }
         # Save the fresh data to the cache
@@ -137,6 +149,14 @@ def get_weather_by_coords(lat, lon):
     try:
         current = weather_api.get_weather_by_coords(lat, lon)
         forecast = weather_api.get_forecast_by_coords(lat, lon)
+        
+        # --- Moon Phase Integration ---
+        moon_data = None
+        try:
+            moon_data = moon_phase.get_moon_phase_data(current['name'], lat, lon, current['timezone'])
+        except Exception:
+            moon_data = None
+        # --- End Moon Phase Integration ---
         
         # --- UV Index Integration ---
         uvi = None
@@ -177,6 +197,7 @@ def get_weather_by_coords(lat, lon):
             "forecast": forecast,
             "aqi": aqi_data,
             "uvi": uvi,
+            "moon": moon_data,
             "error": None
         }
         # Save the fresh data to the cache

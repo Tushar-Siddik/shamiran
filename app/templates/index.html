@@ -179,6 +179,52 @@
                 {% endif %}
                 <!-- End: UV Index Card -->
 
+                <!-- Moon Phase Card -->
+                {% if data.moon %}
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
+                    <h3 class="text-xl font-bold mb-4 text-center">Moon Phase</h3>
+                    
+                    <div class="flex justify-between items-center text-center">
+                        <!-- Left Side: Moonrise & Moonset -->
+                        <div class="flex flex-col justify-center space-y-2">
+                            <div>
+                                <i class="fas fa-arrow-up text-2xl mb-1"></i>
+                                <p class="text-sm font-semibold">Moonrise</p>
+                                <p class="text-lg">{{ data.moon.moonrise }}</p>
+                            </div>
+                            <div>
+                                <i class="fas fa-arrow-down text-2xl mb-1"></i>
+                                <p class="text-sm font-semibold">Moonset</p>
+                                <p class="text-lg">{{ data.moon.moonset }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Center: Moon Phase Emoji & Name -->
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="text-7xl md:text-8xl">
+                                {{ data.moon.current_phase_emoji }}
+                            </div>
+                            <p class="text-lg font-semibold mt-2">{{ data.moon.current_phase_name }}</p>
+                        </div>
+
+                        <!-- Right Side: Next Phase -->
+                        <div class="flex flex-col justify-center space-y-2">
+                            <div>
+                                <i class="fas fa-clock text-2xl mb-1"></i>
+                                <p class="text-sm font-semibold">Next Phase</p>
+                                <p class="text-lg">{{ data.moon.next_phase_name }}</p>
+                            </div>
+                            <div>
+                                <i class="fas fa-calendar-day text-2xl mb-1"></i>
+                                <p class="text-sm font-semibold">On</p>
+                                <p class="text-lg">{{ data.moon.next_phase_date }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- End: Moon Phase Card -->
+
                 <!-- Hourly Forecast -->
                 <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
                     <h3 class="text-2xl font-bold mb-6">Hourly Forecast (Next 15 Hours)</h3>
