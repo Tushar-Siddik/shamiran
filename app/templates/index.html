@@ -71,3 +71,10 @@
     </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    // Pass the initial weather condition from Flask to JavaScript
+    var initialWeatherCondition = "{{ initial_condition }}";
+</script>
+{% endblock %}

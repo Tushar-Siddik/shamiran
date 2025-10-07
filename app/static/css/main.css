@@ -1,0 +1,37 @@
+/* Default background (can be for 'Clear' day) */
+.weather-clear {
+    background: linear-gradient(to right, #56CCF2, #2F80ED);
+}
+
+/* Clouds */
+.weather-clouds,
+.weather-mist,
+.weather-fog {
+    background: linear-gradient(to right, #757F9A, #D7DDE8);
+}
+
+/* Rain, Drizzle */
+.weather-rain,
+.weather-drizzle {
+    background: linear-gradient(to right, #4B79A1, #283E51);
+}
+
+/* Thunderstorm */
+.weather-thunderstorm {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+}
+
+/* Snow */
+.weather-snow {
+    background: linear-gradient(to right, #e6e9f0, #eef1f5);
+}
+
+/* Atmosphere (e.g., Ash, Dust, Sand) */
+.weather-atmosphere {
+    background: linear-gradient(to right, #8E9EAB, #EEF2F3);
+}
+
+/* Default fallback */
+body {
+    background: linear-gradient(to right, #56CCF2, #2F80ED);
+}

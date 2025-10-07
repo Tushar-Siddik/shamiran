@@ -9,7 +9,9 @@ def index():
     """Homepage with default weather for Dhaka."""
     city = "Dhaka"
     data = weather_service.get_weather_data(city)
-    return render_template('index.html', data=data, default_city=city)
+    # Pass the initial condition to the template
+    initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
+    return render_template('index.html', data=data, default_city=city, initial_condition=initial_condition)
 
 @main_bp.route('/weather')
 def get_weather():
@@ -24,5 +26,6 @@ def get_weather():
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify(data)
     
-    # Otherwise, render the full page
-    return render_template('index.html', data=data, default_city=city)
+    initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
+    
+    return render_template('index.html', data=data, default_city=city, initial_condition=initial_condition)
