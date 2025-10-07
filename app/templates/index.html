@@ -109,6 +109,8 @@
                 {% if data.aqi %}
                 <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
                     <h3 class="text-xl font-bold mb-4">Air Quality Index</h3>
+
+                    <!-- Overall AQI -->
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-4xl font-bold">{{ data.aqi.info.level }}</p>
@@ -118,6 +120,24 @@
                             {{ data.aqi.value }}
                         </div>
                     </div>
+
+                    <!-- PM2.5 Index -->
+                    {% if data.aqi.pm25 and data.aqi.pm25.value is not none %}
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-semibold">PM2.5 | {{ data.aqi.pm25.info.level }}</p>
+                            <p class="text-sm text-white/80 mt-1">
+                                Current level is {{ data.aqi.pm25.value | round(1) }} µg/m³
+                            </p>
+                        </div>
+                        <!-- <div class="px-3 py-1 {{ data.aqi.pm25.info.color }} rounded-full text-sm font-semibold shadow-md">
+                            {{ data.aqi.pm25.info.level }}
+                        </div> -->
+                    </div>
+                    {% endif %}
+                    <!-- End: PM2.5 Index -->
+
+                    <!-- End: Overall AQI -->
                 </div>
                 {% endif %}
                 <!-- End: AQI Card -->

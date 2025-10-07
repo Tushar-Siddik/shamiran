@@ -13,6 +13,26 @@ def get_aqi_info(aqi_value):
     }
     return aqi_data.get(aqi_value, {"level": "Unknown", "color": "bg-gray-500"})
 
+# Helper function for PM2.5 classification
+def get_pm25_info(pm25_value):
+    """Classifies PM2.5 value into a health level."""
+    if pm25_value is None:
+        return {"level": "N/A", "color": "bg-gray-500"}
+    
+    # Based on US EPA AQI breakpoints for PM2.5 (µg/m³)
+    if pm25_value <= 12.0:
+        return {"level": "Good", "color": "bg-green-500"}
+    elif pm25_value <= 35.4:
+        return {"level": "Moderate", "color": "bg-yellow-500"}
+    elif pm25_value <= 55.4:
+        return {"level": "Unhealthy for Sensitive", "color": "bg-orange-500"}
+    elif pm25_value <= 150.4:
+        return {"level": "Unhealthy", "color": "bg-red-500"}
+    elif pm25_value <= 250.4:
+        return {"level": "Very Unhealthy", "color": "bg-purple-600"}
+    else:
+        return {"level": "Hazardous", "color": "bg-red-900"}
+
 def get_weather_data(city):
     """
     Gets weather data, using a cache if available.
@@ -36,11 +56,23 @@ def get_weather_data(city):
             lat = current['coord']['lat']
             lon = current['coord']['lon']
             pollution_response = weather_api.get_air_pollution(lat, lon)
+            
+            # Get main AQI
             aqi_value = pollution_response['list'][0]['main']['aqi']
+            
+            # Get PM2.5 value and its classification
+            pm25_value = pollution_response['list'][0]['components'].get('pm2_5')
+            pm25_info = get_pm25_info(pm25_value)
+            
             aqi_data = {
                 "value": aqi_value,
-                "info": get_aqi_info(aqi_value)
+                "info": get_aqi_info(aqi_value),
+                "pm25": {
+                    "value": pm25_value,
+                    "info": pm25_info
+                }
             }
+            
         except (KeyError, IndexError, requests.exceptions.RequestException):
             aqi_data = None # Fail silently if AQI data is not available
         # --- End AQI Integration ---
@@ -80,11 +112,23 @@ def get_weather_by_coords(lat, lon):
         aqi_data = None
         try:
             pollution_response = weather_api.get_air_pollution(lat, lon)
+            
+            # Get main AQI
             aqi_value = pollution_response['list'][0]['main']['aqi']
+            
+            # Get PM2.5 value and its classification
+            pm25_value = pollution_response['list'][0]['components'].get('pm2_5')
+            pm25_info = get_pm25_info(pm25_value)
+            
             aqi_data = {
                 "value": aqi_value,
-                "info": get_aqi_info(aqi_value)
+                "info": get_aqi_info(aqi_value),
+                "pm25": {
+                    "value": pm25_value,
+                    "info": pm25_info
+                }
             }
+            
         except (KeyError, IndexError, requests.exceptions.RequestException):
             aqi_data = None
         # --- End AQI Integration ---
