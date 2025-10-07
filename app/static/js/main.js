@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('search-form');
     const cityInput = document.getElementById('city-input');
+    const geoBtn = document.getElementById('geo-btn');
     const weatherContent = document.getElementById('weather-content');
     const errorContainer = document.getElementById('error-container');
     const errorMessage = document.getElementById('error-message');
@@ -33,6 +34,48 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = `/weather?city=${encodeURIComponent(data.current.name)}`;
         }
     }
+
+    // Geolocation button logic
+    geoBtn.addEventListener('click', function() {
+        if (!navigator.geolocation) {
+            errorMessage.textContent = "Geolocation is not supported by your browser.";
+            errorContainer.classList.remove('hidden');
+            return;
+        }
+
+        geoBtn.disabled = true;
+        geoBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Finding...';
+        weatherContent.innerHTML = '<p class="text-white text-center text-xl">Getting your location...</p>';
+        errorContainer.classList.add('hidden');
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                fetch(`/weather-by-coords?lat=${latitude}&lon=${longitude}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.json())
+                .then(data => updateUI(data))
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    errorMessage.textContent = 'Could not fetch weather for your location.';
+                    errorContainer.classList.remove('hidden');
+                    weatherContent.innerHTML = '';
+                })
+                .finally(() => {
+                    geoBtn.disabled = false;
+                    geoBtn.innerHTML = '<i class="fas fa-location-crosshairs mr-2"></i>My Location';
+                });
+            },
+            (error) => {
+                geoBtn.disabled = false;
+                geoBtn.innerHTML = '<i class="fas fa-location-crosshairs mr-2"></i>My Location';
+                errorMessage.textContent = `Error getting location: ${error.message}`;
+                errorContainer.classList.remove('hidden');
+                weatherContent.innerHTML = '';
+            }
+        );
+    });
 
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault();

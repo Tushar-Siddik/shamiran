@@ -33,3 +33,29 @@ def get_forecast(city):
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response.json()
+
+def get_weather_by_coords(lat, lon):
+    """Fetches weather data using latitude and longitude."""
+    url = f"{BASE_URL}weather"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': API_KEY,
+        'units': 'metric'
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
+
+def get_forecast_by_coords(lat, lon):
+    """Fetches forecast data using latitude and longitude."""
+    url = f"{BASE_URL}forecast"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': API_KEY,
+        'units': 'metric'
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
