@@ -82,7 +82,6 @@ def weather_by_coords():
     data = weather_service.get_weather_by_coords(lat, lon)
     
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # For AJAX, we also need to format the times
         if data.get('current') and data.get('current').get('sys'):
             try:
                 data['current']['formatted_sunrise'] = helpers.format_unix_timestamp(data['current']['sys']['sunrise'], data['current']['timezone'])
@@ -92,9 +91,9 @@ def weather_by_coords():
                 data['current']['formatted_sunset'] = 'N/A'
         return jsonify(data)
     
+    # Fallback for non-AJAX requests
     initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
     
-    # Format sunrise and sunset for non-AJAX
     sunrise_time = None
     sunset_time = None
     if data.get('current') and data.get('current').get('sys'):
@@ -103,10 +102,10 @@ def weather_by_coords():
             sunset_time = helpers.format_unix_timestamp(data['current']['sys']['sunset'], data['current']['timezone'])
         except (KeyError, TypeError):
             pass
-    
-    # Fallback for non-AJAX requests
+
     return render_template('index.html', 
                            data=data, 
                            default_city=data.get('current', {}).get('name', 'Unknown'),
+                           initial_condition=initial_condition,
                            sunrise_time=sunrise_time,
                            sunset_time=sunset_time)

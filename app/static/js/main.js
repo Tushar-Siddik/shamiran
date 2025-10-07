@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const mainCondition = data.current.weather[0].main;
             setWeatherBackground(mainCondition);
 
+            // Update the sunrise/sunset times dynamically
+            const sunriseEl = document.querySelector('p:has(.fa-sun)');
+            const sunsetEl = document.querySelector('p:has(.fa-moon)');
+            if (sunriseEl) sunriseEl.innerHTML = `<i class="fas fa-sun mr-2"></i> Sunrise: ${data.current.formatted_sunrise || 'N/A'}`;
+            if (sunsetEl) sunsetEl.innerHTML = `<i class="fas fa-moon mr-2"></i> Sunset: ${data.current.formatted_sunset || 'N/A'}`;
+
             // For simplicity, we'll reload the page to render the new HTML
             // A more advanced approach would use a JS templating engine
             window.location.href = `/weather?city=${encodeURIComponent(data.current.name)}`;
