@@ -49,12 +49,41 @@ def get_weather_data(city):
         current = weather_api.get_current_weather(city)
         forecast = weather_api.get_forecast(city)
         
+        lat = current['coord']['lat']
+        lon = current['coord']['lon'] 
+        
+        # # --- DEBUGGING: PRINT THE RAW API RESPONSE ---
+        # print("--- RAW API RESPONSE FOR CURRENT WEATHER ---")
+        # import json
+        # print(json.dumps(current, indent=2)) # Pretty-print the JSON
+        # print("--------------------------------------------")
+        # # --- END DEBUGGING ---
+
+        # # --- UV Index Integration ---
+        # uvi = current.get('uvi')
+        # print(f"--- Extracted UVI: {uvi} ---") # Also print what we extracted
+        # # --- End UV Index Integration ---
+        
+        
+        # --- UV Index Integration ---
+        uvi = None
+        try:
+            # Get coordinates from the current weather response
+            # lat = current['coord']['lat']
+            # lon = current['coord']['lon']
+            uvi_response = weather_api.get_uv_index(lat, lon)
+            uvi = uvi_response.get('value')
+        except (KeyError, requests.exceptions.RequestException):
+            # Fail silently if UV Index data is not available
+            pass
+        # --- End UV Index Integration ---
+        
         # --- AQI Integration ---
         aqi_data = None
         try:
             # Get coordinates from the current weather response
-            lat = current['coord']['lat']
-            lon = current['coord']['lon']
+            # lat = current['coord']['lat']
+            # lon = current['coord']['lon']
             pollution_response = weather_api.get_air_pollution(lat, lon)
             
             # Get main AQI
@@ -81,6 +110,7 @@ def get_weather_data(city):
             "current": current,
             "forecast": forecast,
             "aqi": aqi_data,
+            "uvi": uvi,
             "error": None
         }
         # Save the fresh data to the cache
@@ -107,6 +137,15 @@ def get_weather_by_coords(lat, lon):
     try:
         current = weather_api.get_weather_by_coords(lat, lon)
         forecast = weather_api.get_forecast_by_coords(lat, lon)
+        
+        # --- UV Index Integration ---
+        uvi = None
+        try:
+            uvi_response = weather_api.get_uv_index(lat, lon)
+            uvi = uvi_response.get('value')
+        except (KeyError, requests.exceptions.RequestException):
+            pass
+        # --- End UV Index Integration ---
         
         # --- AQI Integration ---
         aqi_data = None
@@ -137,6 +176,7 @@ def get_weather_by_coords(lat, lon):
             "current": current,
             "forecast": forecast,
             "aqi": aqi_data,
+            "uvi": uvi,
             "error": None
         }
         # Save the fresh data to the cache

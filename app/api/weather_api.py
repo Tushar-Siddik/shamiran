@@ -4,6 +4,20 @@ import os
 API_KEY = os.environ.get('API_KEY')
 BASE_URL = "http://api.openweathermap.org/data/2.5/"
 BASE_URL_AIR = "http://api.openweathermap.org/data/2.5/air_pollution"
+BASE_URL_UV = "http://api.openweathermap.org/data/2.5/uvi"
+
+
+def get_uv_index(lat, lon):
+    """Fetches UV Index data for given coordinates."""
+    url = f"{BASE_URL_UV}"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'appid': API_KEY
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
 
 def get_current_weather(city):
     """Fetches current weather data for a given city."""

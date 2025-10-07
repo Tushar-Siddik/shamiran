@@ -142,6 +142,36 @@
                 {% endif %}
                 <!-- End: AQI Card -->
 
+                <!-- UV Index Card -->
+                {% if data.uvi is not none %}
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
+                    <h3 class="text-xl font-bold mb-4">UV Index</h3>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-4xl font-bold">{{ data.uvi }}</p>
+                            <p class="text-sm text-white/80 mt-1">
+                                {% if data.uvi < 3 %}Low - No protection needed.
+                                {% elif data.uvi < 6 %}Moderate - Wear sunscreen.
+                                {% elif data.uvi < 8 %}High - Seek shade during midday.
+                                {% elif data.uvi < 11 %}Very High - Extra protection required.
+                                {% else %}Extreme - Avoid sun exposure.
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg
+                            {% if data.uvi < 3 %} bg-green-500
+                            {% elif data.uvi < 6 %} bg-yellow-500
+                            {% elif data.uvi < 8 %} bg-orange-500
+                            {% elif data.uvi < 11 %} bg-red-500
+                            {% else %} bg-purple-800
+                            {% endif %}">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- End: UV Index Card -->
+
                 <!-- Hourly Forecast -->
                 <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
                     <h3 class="text-2xl font-bold mb-6">Hourly Forecast (Next 15 Hours)</h3>
