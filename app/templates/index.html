@@ -50,6 +50,8 @@
                         <div class="mt-4 space-y-1">
                             <p><i class="fas fa-wind mr-2"></i> Wind: {{ data.current.wind.speed }} m/s</p>
                             <p><i class="fas fa-tint mr-2"></i> Humidity: {{ data.current.main.humidity }}%</p>
+                            <p><i class="fas fa-sun mr-2"></i> Sunrise: {{ sunrise_time or 'N/A' }}</p>
+                            <p><i class="fas fa-moon mr-2"></i> Sunset: {{ sunset_time or 'N/A' }}</p>
                         </div>
                     </div>
                 </div>
