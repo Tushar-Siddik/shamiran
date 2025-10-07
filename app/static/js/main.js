@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- DOM Elements ---
     const searchForm = document.getElementById('search-form');
-    const cityInput = document.getElementById('city-input');
     const weatherContent = document.getElementById('weather-content');
     const errorContainer = document.getElementById('error-container');
     const errorMessage = document.getElementById('error-message');
@@ -11,7 +10,90 @@ document.addEventListener('DOMContentLoaded', function() {
     const favoritesList = document.getElementById('favorites-list');
     // --- Dark Mode Toggle Logic ---
     const darkModeToggle = document.getElementById('dark-mode-toggle');
-    const htmlElement = document.documentElement;
+
+    // --- Auto-suggestions Logic ---
+    const cityInput = document.getElementById('city-input');
+    const suggestionsList = document.getElementById('suggestions-list');
+    let debounceTimer;
+
+    cityInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer); // Clear the previous timer
+
+        if (query.length < 2) {
+            hideSuggestions();
+            return;
+        }
+
+        // Set a new timer
+        debounceTimer = setTimeout(() => {
+            fetchSuggestions(query);
+        }, 300); // Wait for 300ms after user stops typing
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!cityInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+
+    function fetchSuggestions(query) {
+        // Get favorites to highlight them
+        const favorites = getFavorites();
+
+        fetch(`/api/search-suggestions?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(suggestions => {
+                displaySuggestions(suggestions, favorites);
+            })
+            .catch(error => {
+                console.error('Error fetching suggestions:', error);
+                hideSuggestions();
+            });
+    }
+
+    function displaySuggestions(suggestions, favorites) {
+        suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+        if (suggestions.length === 0) {
+            hideSuggestions();
+            return;
+        }
+
+        suggestions.forEach(city => {
+            const li = document.createElement('li');
+            const isFavorite = favorites.includes(city);
+            
+            li.innerHTML = `
+                <button class="w-full text-left px-4 py-2 flex items-center justify-between hover:bg-blue-100/50 transition-colors group">
+                    <span class="text-gray-800 group-hover:text-gray-900">${city}</span>
+                    ${isFavorite ? '<i class="fas fa-star text-yellow-500"></i>' : ''}
+                </button>
+            `;
+            
+            li.querySelector('button').addEventListener('click', () => {
+                cityInput.value = city;
+                hideSuggestions();
+                searchForm.dispatchEvent(new Event('submit'));
+            });
+            
+            suggestionsList.appendChild(li);
+        });
+
+        // Position the list right below the input field
+        const inputRect = cityInput.getBoundingClientRect();
+        suggestionsList.style.top = `${inputRect.bottom + window.scrollY}px`;
+        suggestionsList.style.left = `${inputRect.left + window.scrollX}px`;
+        suggestionsList.style.width = `${inputRect.width}px`;
+
+        suggestionsList.classList.remove('hidden');
+    }
+
+    function hideSuggestions() {
+        suggestionsList.classList.add('hidden');
+    }
+    // --- End: Auto-suggestions Logic ---
 
     let currentCity = initialCityName || 'Dhaka';
 

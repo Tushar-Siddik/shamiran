@@ -1,7 +1,9 @@
+import requests
 from flask import Blueprint, render_template, request, jsonify
 
 main_bp = Blueprint('main', __name__)
 
+from app.api import weather_api
 from app.services import weather_service
 from app.utils import helpers
 
@@ -134,3 +136,75 @@ def weather_by_coords():
                            initial_condition=initial_condition,
                            sunrise_time=sunrise_time,
                            sunset_time=sunset_time)
+    
+# @main_bp.route('/api/search-suggestions')
+# def search_suggestions():
+#     """Provides city name suggestions for the search bar."""
+#     query = request.args.get('q', '').strip()
+#     if not query or len(query) < 2:
+#         return jsonify([])
+
+#     suggestions = set() # Use a set to avoid duplicates
+
+#     # 1. Add matching favorites
+#     favorites = get_favorites_from_request() # We need to create this helper
+#     for fav in favorites:
+#         if query.lower() in fav.lower():
+#             suggestions.add(fav)
+
+#     # 2. Add results from the Geocoding API
+#     try:
+#         # The weather_api.py file will need a new function
+#         geo_results = weather_api.geocode_city(query)
+#         for result in geo_results:
+#             # Format: "City, State, Country" or "City, Country"
+#             name = result.get('name', '')
+#             state = result.get('state', '')
+#             country = result.get('country', '')
+            
+#             if state:
+#                 full_name = f"{name}, {state}, {country}"
+#             else:
+#                 full_name = f"{name}, {country}"
+            
+#             # We only care about cities in Bangladesh for this app
+#             if country == 'BD':
+#                 suggestions.add(full_name)
+#     except requests.exceptions.RequestException:
+#         # If the API fails, we just return the favorites we found
+#         pass
+
+#     # Convert set to a sorted list
+#     return jsonify(sorted(list(suggestions)))
+
+# # Helper function to get favorites from the request cookie
+# def get_favorites_from_request():
+#     # This is a bit of a hack since we don't have user sessions.
+#     # For a real app, this would come from a database.
+#     # For now, we can't easily access localStorage on the server.
+#     # Let's modify the plan: the frontend will send favorites.
+#     # This is a simpler and more robust approach.
+#     pass # We'll remove this and handle it in JS.
+
+@main_bp.route('/api/search-suggestions')
+def search_suggestions():
+    """Provides city name suggestions for the search bar."""
+    query = request.args.get('q', '').strip()
+    if not query or len(query) < 2:
+        return jsonify([])
+
+    suggestions = set()
+
+    try:
+        # We need to create the geocode_city function in weather_api.py
+        geo_results = weather_api.geocode_city(query)
+        for result in geo_results:
+            name = result.get('name', '')
+            country = result.get('country', '')
+            # We only care about cities in Bangladesh
+            if country == 'BD':
+                suggestions.add(name) # Keep it simple, just return the city name
+    except requests.exceptions.RequestException:
+        pass
+
+    return jsonify(sorted(list(suggestions)))

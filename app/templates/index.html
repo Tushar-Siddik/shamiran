@@ -42,16 +42,23 @@
         <!-- End: Weather Alerts Banner -->
 
         <!-- Search Bar -->
-        <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl">
+        <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl relative">
             <form id="search-form" class="flex flex-col sm:flex-row gap-4">
-                <input 
-                    type="text" 
-                    name="city" 
-                    id="city-input"
-                    placeholder="Enter a city in Bangladesh (e.g., Chittagong)" 
-                    class="flex-grow px-4 py-3 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/80"
-                    value="{{ data.current.name if data.current else default_city }}"
-                >
+                <div class="relative flex-grow">
+                    <input 
+                        type="text" 
+                        name="city" 
+                        id="city-input"
+                        autocomplete="off"
+                        placeholder="Enter a city in Bangladesh (e.g., Chittagong)" 
+                        class="w-full px-4 py-3 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/80"
+                        value="{{ data.current.name if data.current else default_city }}"
+                    >
+                    <!-- Suggestions Dropdown -->
+                    <!-- <ul id="suggestions-list" class="absolute z-50 w-full bg-white/90 backdrop-blur-md mt-1 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"> -->
+                        <!-- Suggestions will be injected here by JavaScript -->
+                    <!-- </ul> -->
+                </div>
                 <button type="submit" class="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition duration-300 shadow-lg">
                     <i class="fas fa-search mr-2"></i>Get Weather
                 </button>
@@ -200,4 +207,8 @@
     // Pass the current city name to JS
     var initialCityName = "{{ data.current.name if data.current else default_city }}";
 </script>
+<!-- Suggestions Dropdown -->
+<ul id="suggestions-list" class="fixed z-50 w-full bg-white/90 backdrop-blur-md mt-1 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+    <!-- Suggestions will be injected here by JavaScript -->
+</ul>
 {% endblock %}

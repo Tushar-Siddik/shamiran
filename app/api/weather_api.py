@@ -5,6 +5,7 @@ API_KEY = os.environ.get('API_KEY')
 BASE_URL = "http://api.openweathermap.org/data/2.5/"
 BASE_URL_AIR = "http://api.openweathermap.org/data/2.5/air_pollution"
 BASE_URL_UV = "http://api.openweathermap.org/data/2.5/uvi"
+BASE_URL_GEO = "http://api.openweathermap.org/geo/1.0/direct"
 
 
 def get_uv_index(lat, lon):
@@ -81,6 +82,18 @@ def get_air_pollution(lat, lon):
     params = {
         'lat': lat,
         'lon': lon,
+        'appid': API_KEY
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
+
+def geocode_city(city_name):
+    """Finds cities matching a partial name using the Geocoding API."""
+    url = f"{BASE_URL_GEO}"
+    params = {
+        'q': f"{city_name},BD", # Restrict search to Bangladesh
+        'limit': 5, # Get up to 5 suggestions
         'appid': API_KEY
     }
     response = requests.get(url, params=params)
