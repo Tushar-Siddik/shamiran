@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
             weatherContent.innerHTML = '';
             setWeatherBackground('clouds'); // Default to cloudy on error
         } else if (data.current) {
+            currentCity = data.current.name;
             // Set background based on the main weather condition
             const mainCondition = data.current.weather[0].main;
             setWeatherBackground(mainCondition);
@@ -131,7 +132,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // For simplicity, we'll reload the page to render the new HTML
             // A more advanced approach would use a JS templating engine
-            window.location.href = `/weather?city=${encodeURIComponent(data.current.name)}`;
+            // For simplicity, we will reload the page. This ensures all components
+            // (AQI card, alert banner, etc.) are rendered correctly.
+            window.location.href = `/weather?city=${encodeURIComponent(currentCity)}`;
         }
     }
 

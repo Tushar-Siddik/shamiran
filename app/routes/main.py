@@ -46,12 +46,20 @@ def get_weather():
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         # For AJAX, we also need to format the times
         if data.get('current') and data.get('current').get('sys'):
+            # --- (sunrise/sunset formatting) ---
             try:
                 data['current']['formatted_sunrise'] = helpers.format_unix_timestamp(data['current']['sys']['sunrise'], data['current']['timezone'])
                 data['current']['formatted_sunset'] = helpers.format_unix_timestamp(data['current']['sys']['sunset'], data['current']['timezone'])
             except (KeyError, TypeError):
                 data['current']['formatted_sunrise'] = 'N/A'
                 data['current']['formatted_sunset'] = 'N/A'
+                
+        # Add formatted alert times for AJAX
+        if data.get('current') and data.get('current').get('alerts'):
+            for alert in data['current']['alerts']:
+                alert['formatted_start'] = helpers.format_unix_timestamp(alert['start'], data['current']['timezone'])
+                alert['formatted_end'] = helpers.format_unix_timestamp(alert['end'], data['current']['timezone'])
+        
         return jsonify(data)
     
     initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
@@ -95,6 +103,13 @@ def weather_by_coords():
             except (KeyError, TypeError):
                 data['current']['formatted_sunrise'] = 'N/A'
                 data['current']['formatted_sunset'] = 'N/A'
+                
+        # Add formatted alert times for AJAX
+        if data.get('current') and data.get('current').get('alerts'):
+            for alert in data['current']['alerts']:
+                alert['formatted_start'] = helpers.format_unix_timestamp(alert['start'], data['current']['timezone'])
+                alert['formatted_end'] = helpers.format_unix_timestamp(alert['end'], data['current']['timezone'])
+                
         return jsonify(data)
     
     # Fallback for non-AJAX requests

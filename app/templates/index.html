@@ -19,6 +19,28 @@
 
     <!-- Main Weather Content -->
     <main class="lg:w-3/4">
+        <!-- Weather Alerts Banner -->
+        {% if data.current and data.current.alerts %}
+        <div class="bg-orange-500/90 border-l-4 border-orange-700 text-white p-4 mb-8 rounded-lg shadow-xl" role="alert">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-bold">{{ data.current.alerts[0].event }}</h3>
+                    <p class="text-sm mt-1">
+                        From: {{ data.current.alerts[0].start | strftime('%I:%M %p, %b %d') }} 
+                        To: {{ data.current.alerts[0].end | strftime('%I:%M %p, %b %d') }}
+                    </p>
+                    <div class="mt-2 text-sm">
+                        {{ data.current.alerts[0].description | safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <!-- End: Weather Alerts Banner -->
+
         <!-- Search Bar -->
         <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl">
             <form id="search-form" class="flex flex-col sm:flex-row gap-4">
@@ -38,6 +60,7 @@
                 </button>
             </form>
         </div>
+        <!-- End: Search Bar -->
 
         <!-- Error Message -->
         <div id="error-container" class="hidden bg-red-500/80 text-white p-4 rounded-lg mb-6 text-center">
