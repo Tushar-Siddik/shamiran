@@ -15,16 +15,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentCity = initialCityName || 'Dhaka';
 
-    // Function to set the theme
     function setTheme(theme) {
-        if (theme === 'dark') {
-            htmlElement.classList.add('dark');
-            darkModeToggle.checked = true;
-        } else {
-            htmlElement.classList.remove('dark');
-            darkModeToggle.checked = false;
-        }
+        const appBody = document.getElementById('app-body');
+        // Remove old mode class and add the new one
+        appBody.classList.remove('light-mode', 'dark-mode');
+        appBody.classList.add(`${theme}-mode`);
+        
+        darkModeToggle.checked = theme === 'dark';
         localStorage.setItem('theme', theme);
+    }
+
+    // Function to set the dynamic weather theme
+    function setWeatherTheme(mainCondition) {
+        const appBody = document.getElementById('app-body');
+        // Remove old weather class and add the new one
+        appBody.className = appBody.className.replace(/weather-\S+/g, '').trim();
+        const conditionClass = `weather-${mainCondition.toLowerCase()}`;
+        appBody.classList.add(conditionClass);
+    }
+
+    // Function to update the UI
+    function updateUI(data) {
+        if (data.error) {
+            errorMessage.textContent = data.error;
+            errorContainer.classList.remove('hidden');
+            weatherContent.innerHTML = '';
+            setWeatherTheme('clouds'); // Default to cloudy on error
+        } else if (data.current) {
+            currentCity = data.current.name;
+            const mainCondition = data.current.weather[0].main;
+            setWeatherTheme(mainCondition); // Set weather class
+
+            // Update the sunrise/sunset times dynamically
+            const sunriseEl = document.querySelector('p:has(.fa-sun)');
+            const sunsetEl = document.querySelector('p:has(.fa-moon)');
+            if (sunriseEl) sunriseEl.innerHTML = `<i class="fas fa-sun mr-2"></i> Sunrise: ${data.current.formatted_sunrise || 'N/A'}`;
+            if (sunsetEl) sunsetEl.innerHTML = `<i class="fas fa-moon mr-2"></i> Sunset: ${data.current.formatted_sunset || 'N/A'}`;
+
+            // For simplicity, we'll reload the page to render the new HTML
+            // A more advanced approach would use a JS templating engine
+            // For simplicity, we will reload the page. This ensures all components
+            // (AQI card, alert banner, etc.) are rendered correctly.
+            window.location.href = `/weather?city=${encodeURIComponent(currentCity)}`;
+        }
     }
 
     // Function to toggle the theme
@@ -146,33 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
         appBody.classList.add('min-h-screen', 'transition-all', 'duration-1000', conditionClass);
     }
 
-    // Function to update the UI
-    function updateUI(data) {
-        if (data.error) {
-            errorMessage.textContent = data.error;
-            errorContainer.classList.remove('hidden');
-            weatherContent.innerHTML = '';
-            setWeatherBackground('clouds'); // Default to cloudy on error
-        } else if (data.current) {
-            currentCity = data.current.name;
-            // Set background based on the main weather condition
-            const mainCondition = data.current.weather[0].main;
-            setWeatherBackground(mainCondition);
-
-            // Update the sunrise/sunset times dynamically
-            const sunriseEl = document.querySelector('p:has(.fa-sun)');
-            const sunsetEl = document.querySelector('p:has(.fa-moon)');
-            if (sunriseEl) sunriseEl.innerHTML = `<i class="fas fa-sun mr-2"></i> Sunrise: ${data.current.formatted_sunrise || 'N/A'}`;
-            if (sunsetEl) sunsetEl.innerHTML = `<i class="fas fa-moon mr-2"></i> Sunset: ${data.current.formatted_sunset || 'N/A'}`;
-
-            // For simplicity, we'll reload the page to render the new HTML
-            // A more advanced approach would use a JS templating engine
-            // For simplicity, we will reload the page. This ensures all components
-            // (AQI card, alert banner, etc.) are rendered correctly.
-            window.location.href = `/weather?city=${encodeURIComponent(currentCity)}`;
-        }
-    }
-
     // Geolocation button logic
     geoBtn.addEventListener('click', function() {
         if (!navigator.geolocation) {
@@ -240,7 +246,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set initial background on page load
     // We can get this from a global variable set by the template
     if (typeof initialWeatherCondition !== 'undefined') {
-        setWeatherBackground(initialWeatherCondition);
+        setWeatherTheme(initialWeatherCondition); // Set weather class
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme); // Set mode class
+
         renderFavorites();
         updateFavoriteButton();
     }

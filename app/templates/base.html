@@ -8,16 +8,18 @@
     <!-- Theme Script to prevent flash -->
     <script>
         (function() {
-            const theme = localStorage.getItem('theme');
-            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            }
+            const theme = localStorage.getItem('theme') || 'light';
+            const condition = "{{ initialWeatherCondition or 'Clear' }}".toLowerCase();
+            // Apply both weather and mode classes to the body
+            document.body.className = `weather-${condition} ${theme}-mode min-h-screen transition-all duration-1000`;
         })();
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> -->
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
