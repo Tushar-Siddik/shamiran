@@ -9,8 +9,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const geoBtn = document.getElementById('geo-btn');
     const favoriteBtn = document.getElementById('favorite-btn');
     const favoritesList = document.getElementById('favorites-list');
+    // --- Dark Mode Toggle Logic ---
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const htmlElement = document.documentElement;
 
     let currentCity = initialCityName || 'Dhaka';
+
+    // Function to set the theme
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            htmlElement.classList.add('dark');
+            darkModeToggle.checked = true;
+        } else {
+            htmlElement.classList.remove('dark');
+            darkModeToggle.checked = false;
+        }
+        localStorage.setItem('theme', theme);
+    }
+
+    // Function to toggle the theme
+    function toggleTheme() {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+    }
+
+    // Initialize theme on page load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        setTheme(savedTheme);
+    } else {
+        // Default to light mode or respect OS preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+    }
+
+    // Add event listener to the toggle
+    darkModeToggle.addEventListener('change', toggleTheme);
 
     // --- Favorites Management ---
     function getFavorites() {

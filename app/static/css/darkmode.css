@@ -1,0 +1,67 @@
+/* 1. Define CSS Variables for Light Mode (Default) */
+:root {
+    --bg-primary: linear-gradient(to right, #56CCF2, #2F80ED);
+    --bg-secondary: rgba(255, 255, 255, 0.2);
+    --bg-card: rgba(255, 255, 255, 0.2);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --border-color: rgba(255, 255, 255, 0.2);
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 2. Override Variables for Dark Mode */
+.dark {
+    --bg-primary: linear-gradient(to right, #1a1a2e, #16213e);
+    --bg-secondary: rgba(30, 30, 46, 0.8);
+    --bg-card: rgba(40, 40, 60, 0.8);
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* 3. Apply Variables to Elements */
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.bg-white\/20 {
+    background-color: var(--bg-card);
+    backdrop-filter: blur(12px);
+}
+
+.bg-white\/10 {
+    background-color: var(--bg-secondary);
+}
+
+.text-white {
+    color: var(--text-primary) !important;
+}
+
+.text-white\/80 {
+    color: var(--text-secondary) !important;
+}
+
+.text-white\/60 {
+    color: var(--text-muted) !important;
+}
+
+.border-white\/20 {
+    border-color: var(--border-color) !important;
+}
+
+.shadow-xl {
+    box-shadow: var(--shadow);
+}
+
+/* Specific overrides for dynamic backgrounds */
+.dark .weather-clear { background: linear-gradient(to right, #1a1a2e, #0f3460); }
+.dark .weather-clouds, .dark .weather-mist, .dark .weather-fog { background: linear-gradient(to right, #232526, #414345); }
+.dark .weather-rain, .dark .weather-drizzle { background: linear-gradient(to right, #0f2027, #203a43, #2c5364); }
+.dark .weather-thunderstorm { background: linear-gradient(to right, #141e30, #243b55); }
+.dark .weather-snow { background: linear-gradient(to right, #e6dada, #274046); }
+.dark .weather-atmosphere { background: linear-gradient(to right, #4b6cb7, #182848); }
