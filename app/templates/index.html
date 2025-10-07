@@ -61,6 +61,7 @@
                         <button id="favorite-btn" class="text-3xl hover:scale-110 transition-transform" title="Add to Favorites">
                             <i class="far fa-star"></i>
                         </button>
+                        <!-- End: Favorite Toggle Button -->
                     </div>
                     <div class="flex flex-col md:flex-row items-center justify-between">
                         <div>
@@ -79,10 +80,28 @@
                         </div>
                     </div>
                 </div>
+                <!-- End: Current Weather Card -->
+
+                <!-- AQI Card -->
+                {% if data.aqi %}
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
+                    <h3 class="text-xl font-bold mb-4">Air Quality Index</h3>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-4xl font-bold">{{ data.aqi.info.level }}</p>
+                            <p class="text-sm text-white/80 mt-1">Current AQI is {{ data.aqi.value }} (Index 1-5)</p>
+                        </div>
+                        <div class="w-16 h-16 {{ data.aqi.info.color }} rounded-full flex items-center justify-center text-2xl font-bold shadow-lg">
+                            {{ data.aqi.value }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- End: AQI Card -->
 
                 <!-- 5-Day Forecast -->
                 <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
-                    <h3 class="text-2xl font-bold mb-6">5-Day Forecast</h3>
+                    <h3 class="text-2xl font-bold mb-6">3 Hours Forecast</h3>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                         {% for day in data.forecast.list[:5] %}
                         <div class="bg-white/10 rounded-lg p-4 text-center">
@@ -96,6 +115,7 @@
                 </div>
             {% endif %}
         </div>
+        <!-- End: Weather Display -->
     </main>
 </div>
 {% endblock %}

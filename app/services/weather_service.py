@@ -2,6 +2,17 @@ from app.api import weather_api
 from app.utils import cache
 import requests
 
+# Helper to get AQI description and color
+def get_aqi_info(aqi_value):
+    aqi_data = {
+        1: {"level": "Good", "color": "bg-green-500"},
+        2: {"level": "Fair", "color": "bg-lime-500"},
+        3: {"level": "Moderate", "color": "bg-yellow-500"},
+        4: {"level": "Poor", "color": "bg-orange-500"},
+        5: {"level": "Very Poor", "color": "bg-red-600"},
+    }
+    return aqi_data.get(aqi_value, {"level": "Unknown", "color": "bg-gray-500"})
+
 def get_weather_data(city):
     """
     Gets weather data, using a cache if available.
@@ -17,9 +28,27 @@ def get_weather_data(city):
     try:
         current = weather_api.get_current_weather(city)
         forecast = weather_api.get_forecast(city)
+        
+        # --- AQI Integration ---
+        aqi_data = None
+        try:
+            # Get coordinates from the current weather response
+            lat = current['coord']['lat']
+            lon = current['coord']['lon']
+            pollution_response = weather_api.get_air_pollution(lat, lon)
+            aqi_value = pollution_response['list'][0]['main']['aqi']
+            aqi_data = {
+                "value": aqi_value,
+                "info": get_aqi_info(aqi_value)
+            }
+        except (KeyError, IndexError, requests.exceptions.RequestException):
+            aqi_data = None # Fail silently if AQI data is not available
+        # --- End AQI Integration ---
+        
         data = {
             "current": current,
             "forecast": forecast,
+            "aqi": aqi_data,
             "error": None
         }
         # Save the fresh data to the cache
@@ -46,9 +75,24 @@ def get_weather_by_coords(lat, lon):
     try:
         current = weather_api.get_weather_by_coords(lat, lon)
         forecast = weather_api.get_forecast_by_coords(lat, lon)
+        
+        # --- AQI Integration ---
+        aqi_data = None
+        try:
+            pollution_response = weather_api.get_air_pollution(lat, lon)
+            aqi_value = pollution_response['list'][0]['main']['aqi']
+            aqi_data = {
+                "value": aqi_value,
+                "info": get_aqi_info(aqi_value)
+            }
+        except (KeyError, IndexError, requests.exceptions.RequestException):
+            aqi_data = None
+        # --- End AQI Integration ---
+
         data = {
             "current": current,
             "forecast": forecast,
+            "aqi": aqi_data,
             "error": None
         }
         # Save the fresh data to the cache
