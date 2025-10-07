@@ -323,3 +323,120 @@ button#geo-btn, #favorite-btn {
 .moon-card-dark-mode .text-orange-300 { color: #fdba74 !important; }
 .moon-card-dark-mode .text-purple-300 { color: #e9d5ff !important; }
 .moon-card-dark-mode .text-green-300 { color: #86efac !important; }
+
+/* --- WEATHER ANIMATIONS --- */
+
+/* Animation Container */
+#weather-animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allows clicking through the animation */
+    overflow: hidden;
+    z-index: 1; /* Behind content, but above background */
+}
+
+/* Base Particle Style */
+.weather-particle {
+    position: absolute;
+    background-color: #fff; /* Default color, will be overridden */
+    opacity: 0.8;
+    border-radius: 50%;
+}
+
+/* --- Cloud Animation --- */
+.cloud-particle {
+    width: 100px;
+    height: 40px;
+    background: #f0f0f0;
+    border-radius: 100px;
+    position: absolute;
+    opacity: 0.7;
+    animation: drift linear infinite;
+}
+
+.cloud-particle::before,
+.cloud-particle::after {
+    content: '';
+    position: absolute;
+    background: #f0f0f0;
+    border-radius: 100px;
+}
+
+.cloud-particle::before {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: 10px;
+}
+
+.cloud-particle::after {
+    width: 60px;
+    height: 20px;
+    top: -10px;
+    right: 10px;
+}
+
+@keyframes drift {
+    from {
+        transform: translateX(-150px); /* Start off-screen to the left */
+    }
+    to {
+        transform: translateX(calc(100vw + 150px)); /* End off-screen to the right */
+    }
+}
+
+/* --- Rain Animation --- */
+.rain-particle {
+    width: 2px;
+    height: 15px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6));
+    border-radius: 100%;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+    }
+}
+
+/* --- Snow Animation --- */
+.snow-particle {
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+    opacity: 0.8;
+    animation: snowfall linear infinite;
+}
+
+@keyframes snowfall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+/* --- Thunderstorm Flash --- */
+.thunderstorm-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    z-index: 9999; /* On top of everything */
+    pointer-events: none;
+}
+
+.flash-animation {
+    animation: flash 0.2s ease-out;
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}

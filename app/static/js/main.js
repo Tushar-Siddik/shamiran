@@ -130,10 +130,12 @@ document.addEventListener('DOMContentLoaded', function() {
             errorContainer.classList.remove('hidden');
             weatherContent.innerHTML = '';
             setWeatherTheme('clouds'); // Default to cloudy on error
+            setWeatherAnimation('clouds'); // Set a default animation
         } else if (data.current) {
             currentCity = data.current.name;
             const mainCondition = data.current.weather[0].main;
             setWeatherTheme(mainCondition); // Set weather class
+            setWeatherAnimation(mainCondition);
 
             // Update the sunrise/sunset times dynamically
             const sunriseEl = document.querySelector('p:has(.fa-sun)');
@@ -336,6 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // We can get this from a global variable set by the template
     if (typeof initialWeatherCondition !== 'undefined') {
         setWeatherTheme(initialWeatherCondition); // Set weather class
+        setWeatherAnimation(initialWeatherCondition);
+
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme); // Set mode class
 
@@ -401,3 +405,127 @@ function initializeMap(lat, lon, cityName, apiKey) {
     L.control.layers(null, overlayMaps).addTo(map);
 }
 // --- End: Map Integration ---
+
+// --- Weather Animation Manager ---
+const animationContainer = document.createElement('div');
+animationContainer.id = 'weather-animation-container';
+document.body.appendChild(animationContainer);
+
+let animationInterval;
+
+function setWeatherAnimation(weatherCondition) {
+    // Clear any existing animations
+    clearWeatherAnimation();
+
+    const condition = weatherCondition.toLowerCase();
+    let particleCount = 0;
+    let particleClass = '';
+    let interval = 50;
+
+    switch (condition) {
+        case 'clouds':
+        case 'mist':
+        case 'fog':
+        case 'haze':
+            particleClass = 'cloud-particle';
+            particleCount = 4; // Create a few clouds
+            createClouds(particleCount);
+            break;
+        case 'rain':
+        case 'drizzle':
+            particleClass = 'rain-particle';
+            particleCount = 100;
+            interval = 30;
+            createRainOrSnow(particleClass, particleCount, interval);
+            break;
+        case 'snow':
+            particleClass = 'snow-particle';
+            particleCount = 50;
+            interval = 200;
+            createRainOrSnow(particleClass, particleCount, interval);
+            break;
+        case 'thunderstorm':
+            particleClass = 'rain-particle';
+            particleCount = 150;
+            interval = 20;
+            createRainOrSnow(particleClass, particleCount, interval);
+            startLightning();
+            break;
+        default:
+            // For 'clear' or any other weather, do nothing
+            return;
+    }
+
+    // Create particles
+    for (let i = 0; i < particleCount; i++) {
+        setTimeout(() => {
+            createParticle(particleClass);
+        }, Math.random() * 2000); // Stagger the creation
+    }
+}
+
+// --- Refactored Particle Creation ---
+function createClouds(count) {
+    for (let i = 0; i < count; i++) {
+        createParticle('cloud-particle', Math.random() * 5 + 10); // Slower, varied speed
+    }
+}
+
+function createRainOrSnow(className, count, interval) {
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            createParticle(className);
+        }, Math.random() * 2000);
+    }
+}
+
+function createParticle(className, customDuration = null) {
+    const particle = document.createElement('div');
+    particle.className = `weather-particle ${className}`;
+    
+    const startX = Math.random() * window.innerWidth;
+    const animationDuration = customDuration || (Math.random() * 1 + 0.5) + 's';
+    const animationDelay = Math.random() * 2 + 's';
+
+    particle.style.left = `${startX}px`;
+    particle.style.top = `${Math.random() * 50}%`; // Clouds can be at different heights
+    particle.style.animationDuration = animationDuration;
+    particle.style.animationDelay = animationDelay;
+    
+    // Scale clouds randomly for variety
+    if (className === 'cloud-particle') {
+        particle.style.transform = `scale(${Math.random() * 0.5 + 0.8})`;
+    }
+    
+    animationContainer.appendChild(particle);
+
+    const totalDuration = parseFloat(animationDuration) + parseFloat(animationDelay) * 1000;
+    setTimeout(() => {
+        if (particle.parentNode) {
+            particle.remove();
+        }
+    }, totalDuration);
+}
+
+function clearWeatherAnimation() {
+    // Clear the interval for lightning
+    if (animationInterval) {
+        clearInterval(animationInterval);
+    }
+    // Remove all child nodes (particles)
+    while (animationContainer.firstChild) {
+        animationContainer.removeChild(animationContainer.firstChild);
+    }
+}
+
+function startLightning() {
+    animationInterval = setInterval(() => {
+        if (Math.random() > 0.8) { // 20% chance of lightning
+            const flash = document.createElement('div');
+            flash.className = 'thunderstorm-flash flash-animation';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 200); // Remove after animation
+        }
+    }, 3000); // Check for lightning every 3 seconds
+}
+// --- End: Weather Animation Manager ---
