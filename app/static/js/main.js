@@ -99,9 +99,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setTheme(theme) {
         const appBody = document.getElementById('app-body');
+        const moonCard = document.getElementById('moon-card');
+
         // Remove old mode class and add the new one
         appBody.classList.remove('light-mode', 'dark-mode');
         appBody.classList.add(`${theme}-mode`);
+
+        if (moonCard) {
+            moonCard.classList.remove('moon-card-light-mode', 'moon-card-dark-mode');
+            moonCard.classList.add(`moon-card-${theme}-mode`);
+        }
         
         darkModeToggle.checked = theme === 'dark';
         localStorage.setItem('theme', theme);

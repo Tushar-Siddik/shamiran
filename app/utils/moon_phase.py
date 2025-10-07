@@ -33,6 +33,7 @@ def get_moon_phase_data(city_name, lat, lon, timezone_offset):
         # 1. Get current phase
         phase_number = moon.phase(today_date)
         current_phase_name, current_phase_emoji = _get_phase_details(phase_number)
+        phase_class = current_phase_name.lower().replace(' ', '-')
 
         # 2. Get moonrise and moonset
         # The observer object is needed for these calculations
@@ -67,6 +68,7 @@ def get_moon_phase_data(city_name, lat, lon, timezone_offset):
             "moonset": moonset_formatted,
             "current_phase_name": current_phase_name,
             "current_phase_emoji": current_phase_emoji,
+            "current_phase_class": phase_class,
             "next_phase_date": next_phase_date.strftime('%B %d') if next_phase_date else "N/A",
             "next_phase_name": next_phase_name or "N/A",
         }

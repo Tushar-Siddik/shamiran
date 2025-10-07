@@ -214,3 +214,112 @@ button#geo-btn, #favorite-btn {
     text-align: center;
     line-height: 30px; /* Match iconSize height */
 }
+
+/* --- Smart Moon Phase Graphics --- */
+.moon-phase-graphic {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 50%;
+    background: #f4f4f4; /* Base color of the moon */
+    /* box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), inset -10px -10px 20px rgba(0, 0, 0, 0.3); */
+    overflow: hidden;
+    /* Add a subtle glow to the moon itself */
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+}
+
+.moon-phase-graphic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* background: #1a1a2e; Color of the shadow */
+    transition: all 0.5s ease-in-out;
+}
+
+/* --- Phase Definitions --- */
+/* New Moon */
+.moon-phase-graphic.new-moon::before {
+    background: #1a1a2e;
+}
+
+/* Waxing Crescent */
+.moon-phase-graphic.waxing-crescent::before {
+    background: #1a1a2e;
+    clip-path: ellipse(40% 100% at 0% 50%);
+}
+
+/* First Quarter */
+.moon-phase-graphic.first-quarter::before {
+    background: #1a1a2e;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Waxing Gibbous */
+.moon-phase-graphic.waxing-gibbous::before {
+    background: #1a1a2e;
+    clip-path: ellipse(40% 100% at 100% 50%);
+}
+
+/* Full Moon */
+.moon-phase-graphic.full-moon::before {
+    background: transparent;
+    box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Waning Gibbous */
+.moon-phase-graphic.waning-gibbous::before {
+    background: #1a1a2e;
+    clip-path: ellipse(40% 100% at 0% 50%);
+    transform: rotate(180deg);
+}
+
+/* Last Quarter */
+.moon-phase-graphic.last-quarter::before {
+    background: #1a1a2e;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: rotate(180deg);
+}
+
+/* Waning Crescent */
+.moon-phase-graphic.waning-crescent::before {
+    background: #1a1a2e;
+    clip-path: ellipse(40% 100% at 100% 50%);
+    transform: rotate(180deg);
+}
+
+/* Light Mode Theme for Moon Card */
+/* .moon-card-light-mode { */
+    /* Explicitly set background and border to override any inherited theme */
+    /* background: linear-gradient(to right, #e0e7ff, #c7d2fe, #a5b4fc) !important; */
+    /* border-color: #c7d2fe !important; */
+    /* color: #1e293b !important; */
+/* } */
+.moon-card-light-mode h3 { color: #1e293b !important; }
+.moon-card-light-mode .text-blue-300 { color: #3b82f6 !important; }
+.moon-card-light-mode .text-orange-300 { color: #f97316 !important; }
+.moon-card-light-mode .text-purple-300 { color: #7c3aed !important; }
+.moon-card-light-mode .text-green-300 { color: #16a34a !important; }
+.moon-card-light-mode .moon-phase-graphic {
+    background: #f8fafc !important;
+    /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1), inset -10px -10px 20px rgba(0, 0, 0, 0.2); */
+}
+/* .moon-card-light-mode .moon-phase-graphic::before {
+    background: #475569 !important;
+} */
+
+/* Dark Mode Theme for Moon Card (Explicitly defined) */
+.moon-card-dark-mode {
+    /* Explicitly set background and border to override any inherited theme */
+    /* background: linear-gradient(to right, #1e1b4b, #581c87, #1e1b4b) !important; */
+    /* border-color: #4c1d95 !important; */
+    color: #f3e8ff !important;
+}
+.moon-card-dark-mode h3 { color: #f3e8ff !important; }
+.moon-card-dark-mode .text-blue-300 { color: #93c5fd !important; }
+.moon-card-dark-mode .text-orange-300 { color: #fdba74 !important; }
+.moon-card-dark-mode .text-purple-300 { color: #e9d5ff !important; }
+.moon-card-dark-mode .text-green-300 { color: #86efac !important; }
