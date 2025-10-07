@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import Blueprint, render_template, request, jsonify
 
@@ -27,13 +28,15 @@ def index():
         except (KeyError, TypeError):
             pass # Ignore if data is missing
 
-    return render_template('index.html', 
-                           data=data, 
-                        #    default_city=city,
-                           default_city=city_name_from_api, 
-                           initial_condition=initial_condition,
-                           sunrise_time=sunrise_time,
-                           sunset_time=sunset_time)
+    context = {
+        'data': data, 
+        'default_city': city_name_from_api, 
+        'initial_condition': initial_condition,
+        'sunrise_time': sunrise_time,
+        'sunset_time': sunset_time,
+        'config': {'API_KEY': os.environ.get('API_KEY')}
+    }
+    return render_template('index.html', **context)
 
 @main_bp.route('/weather')
 def get_weather():
@@ -78,13 +81,15 @@ def get_weather():
         except (KeyError, TypeError):
             pass
 
-    return render_template('index.html', 
-                           data=data, 
-                        #    default_city=city, 
-                           default_city=city_name_from_api,
-                           initial_condition=initial_condition,
-                           sunrise_time=sunrise_time,
-                           sunset_time=sunset_time)
+    context = {
+        'data': data, 
+        'default_city': city_name_from_api,
+        'initial_condition': initial_condition,
+        'sunrise_time': sunrise_time,
+        'sunset_time': sunset_time,
+        'config': {'API_KEY': os.environ.get('API_KEY')}
+    }
+    return render_template('index.html', **context)
 
 @main_bp.route('/weather-by-coords')
 def weather_by_coords():
@@ -129,13 +134,15 @@ def weather_by_coords():
         except (KeyError, TypeError):
             pass
 
-    return render_template('index.html', 
-                           data=data, 
-                        #    default_city=data.get('current', {}).get('name', 'Unknown'),
-                           default_city=city_name_from_api,
-                           initial_condition=initial_condition,
-                           sunrise_time=sunrise_time,
-                           sunset_time=sunset_time)
+    context = {
+        'data': data, 
+        'default_city': city_name_from_api,
+        'initial_condition': initial_condition,
+        'sunrise_time': sunrise_time,
+        'sunset_time': sunset_time,
+        'config': {'API_KEY': os.environ.get('API_KEY')}
+    }
+    return render_template('index.html', **context)
     
 # @main_bp.route('/api/search-suggestions')
 # def search_suggestions():

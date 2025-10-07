@@ -206,3 +206,11 @@ button#geo-btn, #favorite-btn {
     background-color: var(--bg-input);
     color: var(--text-primary);
 }
+
+/* Custom Leaflet Marker Icon */
+.custom-div-icon {
+    background: transparent;
+    border: none;
+    text-align: center;
+    line-height: 30px; /* Match iconSize height */
+}

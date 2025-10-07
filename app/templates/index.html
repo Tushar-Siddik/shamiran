@@ -112,72 +112,94 @@
                 </div>
                 <!-- End: Current Weather Card -->
 
-                <!-- AQI Card -->
-                {% if data.aqi %}
-                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
-                    <h3 class="text-xl font-bold mb-4">Air Quality Index</h3>
-
-                    <!-- Overall AQI -->
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-4xl font-bold">{{ data.aqi.info.level }}</p>
-                            <p class="text-sm text-white/80 mt-1">Current AQI is {{ data.aqi.value }} (Index 1-5)</p>
+                <!-- Hourly Forecast -->
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
+                    <h3 class="text-2xl font-bold mb-6">Hourly Forecast (Next 15 Hours)</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        {% for day in data.forecast.list[:5] %}
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <p class="font-semibold">{{ day.dt_txt | strftime('%a') }}</p>
+                            <p class="text-sm">{{ day.dt_txt[11:16] }}</p>
+                            <img src="http://openweathermap.org/img/wn/{{ day.weather[0].icon }}@2x.png" alt="Weather icon" class="w-16 h-16 mx-auto my-2">
+                            <p class="text-lg font-bold">{{ "%.1f"|format(day.main.temp) }}°C</p>
                         </div>
-                        <div class="w-16 h-16 {{ data.aqi.info.color }} rounded-full flex items-center justify-center text-2xl font-bold shadow-lg">
-                            {{ data.aqi.value }}
-                        </div>
+                        {% endfor %}
                     </div>
-
-                    <!-- PM2.5 Index -->
-                    {% if data.aqi.pm25 and data.aqi.pm25.value is not none %}
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-lg font-semibold">PM2.5 | {{ data.aqi.pm25.info.level }}</p>
-                            <p class="text-sm text-white/80 mt-1">
-                                Current level is {{ data.aqi.pm25.value | round(1) }} µg/m³
-                            </p>
-                        </div>
-                        <!-- <div class="px-3 py-1 {{ data.aqi.pm25.info.color }} rounded-full text-sm font-semibold shadow-md">
-                            {{ data.aqi.pm25.info.level }}
-                        </div> -->
-                    </div>
-                    {% endif %}
-                    <!-- End: PM2.5 Index -->
-
-                    <!-- End: Overall AQI -->
                 </div>
-                {% endif %}
-                <!-- End: AQI Card -->
+                <!-- End: Hourly Forecast -->
 
-                <!-- UV Index Card -->
-                {% if data.uvi is not none %}
-                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
-                    <h3 class="text-xl font-bold mb-4">UV Index</h3>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-4xl font-bold">{{ data.uvi }}</p>
-                            <p class="text-sm text-white/80 mt-1">
-                                {% if data.uvi < 3 %}Low - No protection needed.
-                                {% elif data.uvi < 6 %}Moderate - Wear sunscreen.
-                                {% elif data.uvi < 8 %}High - Seek shade during midday.
-                                {% elif data.uvi < 11 %}Very High - Extra protection required.
-                                {% else %}Extreme - Avoid sun exposure.
+                <!-- Combined Health Index Card -->
+                {% if data.uvi is not none or data.aqi %}
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mt-8 mb-8 shadow-xl text-white">
+                    <!-- Title Row for Perfect Alignment -->
+                    <div class="flex justify-around items-center text-center mb-6">
+                        <div class="flex-1">
+                            <p class="text-lg font-semibold">Air Quality Index</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-lg font-semibold">UV Index</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-lg font-semibold">PM2.5</p>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="flex justify-between items-center text-center gap-4">
+                        <!-- Left Column: Air Quality Index -->
+                        {% if data.aqi %}
+                        <div class="flex-1 flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 {{ data.aqi.info.color }} rounded-full flex items-center justify-center text-2xl font-bold shadow-lg mb-2">
+                                {{ data.aqi.value }}
+                            </div>
+                            <p class="text-sm font-medium">{{ data.aqi.info.comment }}</p>
+                            <p class="text-sm font-medium">{{ data.aqi.info.level }}</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Center Column: UV Index -->
+                        {% if data.uvi is not none %}
+                        <div class="flex-1 flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg mb-2
+                                {% if data.uvi < 3 %} bg-green-500
+                                {% elif data.uvi < 6 %} bg-yellow-500
+                                {% elif data.uvi < 8 %} bg-orange-500
+                                {% elif data.uvi < 11 %} bg-red-500
+                                {% else %} bg-purple-800
+                                {% endif %}">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <p class="text-sm font-medium leading-tight">
+                                {% if data.uvi < 3 %}
+                                    ✅ No protection needed <br>🌤️ Low
+                                {% elif data.uvi < 6 %}
+                                    🧴 Wear sunscreen <br>🌞 Moderate
+                                {% elif data.uvi < 8 %}
+                                    🕶️ Use sunglass <br>☀️ High
+                                {% elif data.uvi < 11 %}
+                                    🧢 Extra protection <br>🔆 Very High
+                                {% else %}
+                                    🚫 Avoid sun exposure <br>🔥 Extreme
                                 {% endif %}
                             </p>
                         </div>
-                        <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg
-                            {% if data.uvi < 3 %} bg-green-500
-                            {% elif data.uvi < 6 %} bg-yellow-500
-                            {% elif data.uvi < 8 %} bg-orange-500
-                            {% elif data.uvi < 11 %} bg-red-500
-                            {% else %} bg-purple-800
-                            {% endif %}">
-                            <i class="fas fa-sun"></i>
+                        {% endif %}
+
+                        <!-- Right Column: PM2.5 -->
+                        {% if data.aqi and data.aqi.pm25 and data.aqi.pm25.value is not none %}
+                        <div class="flex-1 flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 {{ data.aqi.pm25.info.color }} rounded-full flex flex-col items-center justify-center text-lg font-bold shadow-lg mb-2">
+                                <span>{{ data.aqi.pm25.value | round(1) }}</span>
+                                <span class="text-xs leading-tight">µg/m³</span>
+                            </div>
+                            <p class="text-sm font-medium">{{ data.aqi.pm25.info.comment }}</p>
+                            <p class="text-sm font-medium">{{ data.aqi.pm25.info.level }}</p>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
-                <!-- End: UV Index Card -->
+                <!-- End: Combined Health Index Card -->
 
                 <!-- Moon Phase Card -->
                 {% if data.moon %}
@@ -225,21 +247,32 @@
                 {% endif %}
                 <!-- End: Moon Phase Card -->
 
-                <!-- Hourly Forecast -->
-                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
-                    <h3 class="text-2xl font-bold mb-6">Hourly Forecast (Next 15 Hours)</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                        {% for day in data.forecast.list[:5] %}
-                        <div class="bg-white/10 rounded-lg p-4 text-center">
-                            <p class="font-semibold">{{ day.dt_txt | strftime('%a') }}</p>
-                            <p class="text-sm">{{ day.dt_txt[11:16] }}</p>
-                            <img src="http://openweathermap.org/img/wn/{{ day.weather[0].icon }}@2x.png" alt="Weather icon" class="w-16 h-16 mx-auto my-2">
-                            <p class="text-lg font-bold">{{ "%.1f"|format(day.main.temp) }}°C</p>
-                        </div>
-                        {% endfor %}
-                    </div>
+                <!-- Map Card -->
+                {% if data.current and data.current.coord %}
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
+                    <h3 class="text-xl font-bold mb-4">Interactive Weather Map</h3>
+                    <div id="weather-map" class="w-full h-96 rounded-lg overflow-hidden shadow-inner"></div>
                 </div>
-                <!-- End: Hourly Forecast -->
+
+                <!-- This script calls the function and passes the required data -->
+                <script>
+                    // Wait until the initial HTML document has been completely loaded
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Check if the Leaflet library loaded and the map container exists
+                        if (typeof L !== 'undefined' && document.getElementById('weather-map') && typeof initializeMap === 'function') {
+                            initializeMap(
+                                {{ data.current.coord.lat }}, 
+                                {{ data.current.coord.lon }}, 
+                                "{{ data.current.name }}",
+                                "{{ config.API_KEY }}" // This will now work!
+                            );
+                        } else {
+                            console.error("Could not initialize map. Check if Leaflet is loaded and the initializeMap function exists.");
+                        }
+                    });
+                </script>
+                {% endif %}
+                
             {% endif %}
         </div>
         <!-- End: Weather Display -->

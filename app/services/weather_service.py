@@ -4,14 +4,16 @@ import requests
 
 # Helper to get AQI description and color
 def get_aqi_info(aqi_value):
+    """Classifies AQI value into a health level and provides a range."""
+    # Note: OWM's AQI is a 1-5 index. We'll map it to common EPA ranges for context.
     aqi_data = {
-        1: {"level": "Good", "color": "bg-green-500"},
-        2: {"level": "Fair", "color": "bg-lime-500"},
-        3: {"level": "Moderate", "color": "bg-yellow-500"},
-        4: {"level": "Poor", "color": "bg-orange-500"},
-        5: {"level": "Very Poor", "color": "bg-red-600"},
+        1: {"level": "✨ Good", "color": "bg-green-500", "comment": "✅ All clear"},
+        2: {"level": "🤷 Fair", "color": "bg-lime-500", "comment": "🙂 Still acceptable"},
+        3: {"level": "⚖️ Moderate", "color": "bg-yellow-500", "comment": "⚠️ Sensitive alert"},
+        4: {"level": "👎 Poor", "color": "bg-orange-500", "comment": "🤒 Health risk"},
+        5: {"level": "🚫 Very Poor", "color": "bg-red-600", "comment": "🏠 Stay indoors"}
     }
-    return aqi_data.get(aqi_value, {"level": "Unknown", "color": "bg-gray-500"})
+    return aqi_data.get(aqi_value, {"level": "Unknown", "color": "bg-gray-500", "comment": "Unknown"})
 
 # Helper function for PM2.5 classification
 def get_pm25_info(pm25_value):
@@ -21,17 +23,17 @@ def get_pm25_info(pm25_value):
     
     # Based on US EPA AQI breakpoints for PM2.5 (µg/m³)
     if pm25_value <= 12.0:
-        return {"level": "Good", "color": "bg-green-500"}
+        return {"level": "✨ Good", "color": "bg-green-500", "comment": "✅ Enjoy"}
     elif pm25_value <= 35.4:
-        return {"level": "Moderate", "color": "bg-yellow-500"}
+        return {"level": "⚖️ Moderate", "color": "bg-yellow-500", "comment": "🙂 Mild pollution"}
     elif pm25_value <= 55.4:
-        return {"level": "Unhealthy for Sensitive", "color": "bg-orange-500"}
+        return {"level": "😵 Unhealthy for Sensitive", "color": "bg-orange-500", "comment": "⚠️ Sensitive alert"}
     elif pm25_value <= 150.4:
-        return {"level": "Unhealthy", "color": "bg-red-500"}
+        return {"level": "🤮 Unhealthy", "color": "bg-red-500", "comment": "😷 Use Mask"}
     elif pm25_value <= 250.4:
-        return {"level": "Very Unhealthy", "color": "bg-purple-600"}
+        return {"level": "💀 Very Unhealthy", "color": "bg-purple-600", "comment": "🏠 Stay Indoor"}
     else:
-        return {"level": "Hazardous", "color": "bg-red-900"}
+        return {"level": "☠️ Hazardous", "color": "bg-red-900", "comment": "🚨 Emergency Conditions"}
 
 def get_weather_data(city):
     """

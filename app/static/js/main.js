@@ -335,4 +335,62 @@ document.addEventListener('DOMContentLoaded', function() {
         renderFavorites();
         updateFavoriteButton();
     }
+
 });
+
+
+// --- Map Integration ---
+const mapContainer = document.getElementById('weather-map');
+let map = null; // To hold the map instance
+
+function initializeMap(lat, lon, cityName, apiKey) {
+    if (!mapContainer) {
+        console.error("Map container not found!");
+        return;
+    }
+
+    console.log("Initializing map for:", cityName, lat, lon); // Debugging log
+
+    // If a map already exists, remove it
+    if (map) {
+        map.remove();
+    }
+
+    // Initialize the map, centered on the city
+    map = L.map('weather-map').setView([lat, lon], 10);
+
+    // Add the OpenStreetMap tiles (NO API key needed here)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Create a custom icon for the marker
+    const weatherIcon = L.divIcon({
+        html: '<i class="fas fa-map-marker-alt text-3xl text-blue-500"></i>',
+        iconSize: [30, 30],
+        className: 'custom-div-icon'
+    });
+
+    // Add a marker for the city
+    L.marker([lat, lon], { icon: weatherIcon })
+        .addTo(map)
+        .bindPopup(`<strong>${cityName}</strong>`)
+        .openPopup();
+        
+    // Add weather radar layer (API key IS needed here)
+    const radarUrl = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`;
+    const radarLayer = L.tileLayer(radarUrl, {
+        maxZoom: 19,
+        opacity: 0.6,
+        attribution: 'Weather data © <a href="https://openweathermap.org/">OpenWeatherMap</a>'
+    });
+
+    // Add a layer control to toggle the radar
+    const overlayMaps = {
+        "Precipitation Radar": radarLayer
+    };
+
+    L.control.layers(null, overlayMaps).addTo(map);
+}
+// --- End: Map Integration ---
