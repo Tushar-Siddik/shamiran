@@ -13,6 +13,8 @@ def index():
     # Pass the initial condition to the template
     initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
 
+    city_name_from_api = data.get('current', {}).get('name', city)
+
     # Format sunrise and sunset times
     sunrise_time = None
     sunset_time = None
@@ -25,7 +27,8 @@ def index():
 
     return render_template('index.html', 
                            data=data, 
-                           default_city=city, 
+                        #    default_city=city,
+                           default_city=city_name_from_api, 
                            initial_condition=initial_condition,
                            sunrise_time=sunrise_time,
                            sunset_time=sunset_time)
@@ -53,6 +56,8 @@ def get_weather():
     
     initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
     
+    city_name_from_api = data.get('current', {}).get('name', city)
+    
     # Format sunrise and sunset for non-AJAX
     sunrise_time = None
     sunset_time = None
@@ -65,7 +70,8 @@ def get_weather():
 
     return render_template('index.html', 
                            data=data, 
-                           default_city=city, 
+                        #    default_city=city, 
+                           default_city=city_name_from_api,
                            initial_condition=initial_condition,
                            sunrise_time=sunrise_time,
                            sunset_time=sunset_time)
@@ -94,6 +100,9 @@ def weather_by_coords():
     # Fallback for non-AJAX requests
     initial_condition = data.get('current', {}).get('weather', [{}])[0].get('main', 'Clear')
     
+    city_name_from_api = data.get('current', {}).get('name', 'Unknown')
+    
+    # Format sunrise and sunset for non-AJAX
     sunrise_time = None
     sunset_time = None
     if data.get('current') and data.get('current').get('sys'):
@@ -105,7 +114,8 @@ def weather_by_coords():
 
     return render_template('index.html', 
                            data=data, 
-                           default_city=data.get('current', {}).get('name', 'Unknown'),
+                        #    default_city=data.get('current', {}).get('name', 'Unknown'),
+                           default_city=city_name_from_api,
                            initial_condition=initial_condition,
                            sunrise_time=sunrise_time,
                            sunset_time=sunset_time)

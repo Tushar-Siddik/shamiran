@@ -1,11 +1,105 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // --- DOM Elements ---
     const searchForm = document.getElementById('search-form');
     const cityInput = document.getElementById('city-input');
-    const geoBtn = document.getElementById('geo-btn');
     const weatherContent = document.getElementById('weather-content');
     const errorContainer = document.getElementById('error-container');
     const errorMessage = document.getElementById('error-message');
     const appBody = document.getElementById('app-body');
+    const geoBtn = document.getElementById('geo-btn');
+    const favoriteBtn = document.getElementById('favorite-btn');
+    const favoritesList = document.getElementById('favorites-list');
+
+    let currentCity = initialCityName || 'Dhaka';
+
+    // --- Favorites Management ---
+    function getFavorites() {
+        const favs = localStorage.getItem('shamiran_favorites');
+        return favs ? JSON.parse(favs) : [];
+    }
+
+    function saveFavorites(favorites) {
+        localStorage.setItem('shamiran_favorites', JSON.stringify(favorites));
+    }
+
+    function addFavorite(city) {
+        let favorites = getFavorites();
+        if (!favorites.includes(city)) {
+            favorites.push(city);
+            saveFavorites(favorites);
+            renderFavorites();
+            updateFavoriteButton();
+        }
+    }
+
+    function removeFavorite(city) {
+        let favorites = getFavorites();
+        favorites = favorites.filter(f => f !== city);
+        saveFavorites(favorites);
+        renderFavorites();
+        updateFavoriteButton();
+    }
+
+    function renderFavorites() {
+        const favorites = getFavorites();
+        favoritesList.innerHTML = ''; // Clear current list
+
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<li class="text-white/60">No favorites added yet.</li>';
+            return;
+        }
+
+        favorites.forEach(city => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <button class="w-full text-left px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex justify-between items-center group">
+                    <span>${city}</span>
+                    <i class="fas fa-times text-white/60 hover:text-red-400 group-hover:text-red-400 cursor-pointer" data-city="${city}"></i>
+                </button>
+            `;
+            // Add event listener to the main button for fetching weather
+            li.querySelector('button').addEventListener('click', (e) => {
+                if (e.target.tagName !== 'I') { // Don't trigger if 'X' is clicked
+                    fetchWeatherForCity(city);
+                }
+            });
+            // Add event listener to the 'X' icon for removing
+            li.querySelector('.fa-times').addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFavorite(city);
+            });
+            favoritesList.appendChild(li);
+        });
+    }
+
+    function updateFavoriteButton() {
+        const favorites = getFavorites();
+        const icon = favoriteBtn.querySelector('i');
+        if (favorites.includes(currentCity)) {
+            icon.classList.remove('far');
+            icon.classList.add('fas', 'text-yellow-400');
+            favoriteBtn.title = 'Remove from Favorites';
+        } else {
+            icon.classList.remove('fas', 'text-yellow-400');
+            icon.classList.add('far');
+            favoriteBtn.title = 'Add to Favorites';
+        }
+    }
+
+    favoriteBtn.addEventListener('click', () => {
+        const favorites = getFavorites();
+        if (favorites.includes(currentCity)) {
+            removeFavorite(currentCity);
+        } else {
+            addFavorite(currentCity);
+        }
+    });
+
+    // --- Weather Fetching ---
+    function fetchWeatherForCity(city) {
+        cityInput.value = city;
+        searchForm.dispatchEvent(new Event('submit'));
+    }
 
     // Function to set the dynamic background
     function setWeatherBackground(mainCondition) {
@@ -109,5 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // We can get this from a global variable set by the template
     if (typeof initialWeatherCondition !== 'undefined') {
         setWeatherBackground(initialWeatherCondition);
+        renderFavorites();
+        updateFavoriteButton();
     }
 });

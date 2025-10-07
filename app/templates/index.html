@@ -3,83 +3,107 @@
 {% block title %}Shamiran - Weather for {{ data.current.name if data.current else default_city }}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <!-- Search Bar -->
-    <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl">
-        <form id="search-form" class="flex flex-col sm:flex-row gap-4">
-            <input 
-                type="text" 
-                name="city" 
-                id="city-input"
-                placeholder="Enter a city in Bangladesh (e.g., Chittagong)" 
-                class="flex-grow px-4 py-3 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/80"
-                value="{{ data.current.name if data.current else default_city }}"
-            >
-            <button type="submit" class="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition duration-300 shadow-lg">
-                <i class="fas fa-search mr-2"></i>Get Weather
-            </button>
-            <button type="button" id="geo-btn" class="px-8 py-3 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition duration-300 shadow-lg border border-white/50">
-                <i class="fas fa-location-crosshairs mr-2"></i>My Location
-            </button>
-        </form>
-    </div>
+<div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
+    <!-- Favorites Sidebar -->
+    <aside class="lg:w-1/4">
+        <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 shadow-xl text-white sticky top-8">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-star mr-2"></i> My Favorites
+            </h3>
+            <ul id="favorites-list" class="space-y-2">
+                <!-- Favorites will be populated by JavaScript -->
+                <li class="text-white/60">No favorites added yet.</li>
+            </ul>
+        </div>
+    </aside>
 
-    <!-- Error Message -->
-    <div id="error-container" class="hidden bg-red-500/80 text-white p-4 rounded-lg mb-6 text-center">
-        <p id="error-message"></p>
-    </div>
+    <!-- Main Weather Content -->
+    <main class="lg:w-3/4">
+        <!-- Search Bar -->
+        <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl">
+            <form id="search-form" class="flex flex-col sm:flex-row gap-4">
+                <input 
+                    type="text" 
+                    name="city" 
+                    id="city-input"
+                    placeholder="Enter a city in Bangladesh (e.g., Chittagong)" 
+                    class="flex-grow px-4 py-3 rounded-lg bg-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/80"
+                    value="{{ data.current.name if data.current else default_city }}"
+                >
+                <button type="submit" class="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition duration-300 shadow-lg">
+                    <i class="fas fa-search mr-2"></i>Get Weather
+                </button>
+                <button type="button" id="geo-btn" class="px-8 py-3 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition duration-300 shadow-lg border border-white/50">
+                    <i class="fas fa-location-crosshairs mr-2"></i>My Location
+                </button>
+            </form>
+        </div>
 
-    <!-- Weather Display -->
-    <div id="weather-content">
-        {% if data.error %}
-            <div class="bg-red-500/80 text-white p-4 rounded-lg text-center">
-                <p>{{ data.error }}</p>
-            </div>
-        {% elif data.current %}
-            <!-- Current Weather Card -->
-            <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 mb-8 shadow-xl text-white">
-                <div class="flex flex-col md:flex-row items-center justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold mb-2">{{ data.current.name }}, {{ data.current.sys.country }}</h2>
-                        <p class="text-6xl font-bold">{{ "%.1f"|format(data.current.main.temp) }}°C</p>
-                        <p class="text-xl mt-2">{{ data.current.weather[0].description.title() }}</p>
-                        <p class="text-lg mt-1">Feels like: {{ "%.1f"|format(data.current.main.feels_like) }}°C</p>
+        <!-- Error Message -->
+        <div id="error-container" class="hidden bg-red-500/80 text-white p-4 rounded-lg mb-6 text-center">
+            <p id="error-message"></p>
+        </div>
+
+        <!-- Weather Display -->
+        <div id="weather-content">
+            {% if data.error %}
+                <div class="bg-red-500/80 text-white p-4 rounded-lg text-center">
+                    <p>{{ data.error }}</p>
+                </div>
+            {% elif data.current %}
+                <!-- Current Weather Card -->
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 mb-8 shadow-xl text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-3xl font-bold">
+                            {{ data.current.name }}, {{ data.current.sys.country }}
+                        </h2>
+                        <!-- Favorite Toggle Button -->
+                        <button id="favorite-btn" class="text-3xl hover:scale-110 transition-transform" title="Add to Favorites">
+                            <i class="far fa-star"></i>
+                        </button>
                     </div>
-                    <div class="mt-6 md:mt-0 text-center md:text-right">
-                        <img src="http://openweathermap.org/img/wn/{{ data.current.weather[0].icon }}@4x.png" alt="Weather icon" class="w-32 h-32 mx-auto md:mx-0">
-                        <div class="mt-4 space-y-1">
-                            <p><i class="fas fa-wind mr-2"></i> Wind: {{ data.current.wind.speed }} m/s</p>
-                            <p><i class="fas fa-tint mr-2"></i> Humidity: {{ data.current.main.humidity }}%</p>
-                            <p><i class="fas fa-sun mr-2"></i> Sunrise: {{ sunrise_time or 'N/A' }}</p>
-                            <p><i class="fas fa-moon mr-2"></i> Sunset: {{ sunset_time or 'N/A' }}</p>
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div>
+                            <p class="text-6xl font-bold">{{ "%.1f"|format(data.current.main.temp) }}°C</p>
+                            <p class="text-xl mt-2">{{ data.current.weather[0].description.title() }}</p>
+                            <p class="text-lg mt-1">Feels like: {{ "%.1f"|format(data.current.main.feels_like) }}°C</p>
+                        </div>
+                        <div class="mt-6 md:mt-0 text-center md:text-right">
+                            <img src="http://openweathermap.org/img/wn/{{ data.current.weather[0].icon }}@4x.png" alt="Weather icon" class="w-32 h-32 mx-auto md:mx-0">
+                            <div class="mt-4 space-y-1">
+                                <p><i class="fas fa-wind mr-2"></i> Wind: {{ data.current.wind.speed }} m/s</p>
+                                <p><i class="fas fa-tint mr-2"></i> Humidity: {{ data.current.main.humidity }}%</p>
+                                <p><i class="fas fa-sun mr-2"></i> Sunrise: {{ sunrise_time or 'N/A' }}</p>
+                                <p><i class="fas fa-moon mr-2"></i> Sunset: {{ sunset_time or 'N/A' }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 5-Day Forecast -->
-            <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
-                <h3 class="text-2xl font-bold mb-6">5-Day Forecast</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                    {% for day in data.forecast.list[:5] %}
-                    <div class="bg-white/10 rounded-lg p-4 text-center">
-                        <!-- THIS IS THE LINE TO FIX -->
-                        <p class="font-semibold">{{ day.dt_txt | strftime('%a') }}</p>
-                        <p class="text-sm">{{ day.dt_txt[11:16] }}</p>
-                        <img src="http://openweathermap.org/img/wn/{{ day.weather[0].icon }}@2x.png" alt="Weather icon" class="w-16 h-16 mx-auto my-2">
-                        <p class="text-lg font-bold">{{ "%.1f"|format(day.main.temp) }}°C</p>
+                <!-- 5-Day Forecast -->
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
+                    <h3 class="text-2xl font-bold mb-6">5-Day Forecast</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        {% for day in data.forecast.list[:5] %}
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <p class="font-semibold">{{ day.dt_txt | strftime('%a') }}</p>
+                            <p class="text-sm">{{ day.dt_txt[11:16] }}</p>
+                            <img src="http://openweathermap.org/img/wn/{{ day.weather[0].icon }}@2x.png" alt="Weather icon" class="w-16 h-16 mx-auto my-2">
+                            <p class="text-lg font-bold">{{ "%.1f"|format(day.main.temp) }}°C</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-        {% endif %}
-    </div>
+            {% endif %}
+        </div>
+    </main>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Pass the initial weather condition from Flask to JavaScript
     var initialWeatherCondition = "{{ initial_condition }}";
+    // Pass the current city name to JS
+    var initialCityName = "{{ data.current.name if data.current else default_city }}";
 </script>
 {% endblock %}
