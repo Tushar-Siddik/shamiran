@@ -440,3 +440,124 @@ button#geo-btn, #favorite-btn {
     50% { opacity: 1; }
     100% { opacity: 0; }
 }
+
+
+/* --- CARD-SPECIFIC ANIMATIONS --- */
+
+#card-animation-container .weather-particle {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.6);
+    opacity: 0.7;
+}
+
+/* Card Rain */
+#card-animation-container .card-rain {
+    width: 1px;
+    height: 10px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6));
+    border-radius: 100%;
+    animation: card-fall linear infinite;
+}
+
+@keyframes card-fall {
+    to {
+        transform: translateY(300px); /* Fall to the bottom of the card */
+    }
+}
+
+/* Card Snow */
+#card-animation-container .card-snow {
+    width: 5px;
+    height: 5px;
+    background-color: #fff;
+    opacity: 0.8;
+    animation: card-snowfall linear infinite;
+}
+
+@keyframes card-snowfall {
+    to {
+        transform: translateY(300px) rotate(360deg);
+    }
+}
+
+/* Card Thunderstorm Flash */
+#card-animation-container .thunderstorm-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    opacity: 0;
+    z-index: 5; /* Above other particles, but below content */
+    pointer-events: none;
+}
+
+/* Card Cloud */
+#card-animation-container .card-cloud {
+    width: 40px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 100px;
+    position: absolute;
+    opacity: 0.8;
+    animation: card-float-right linear infinite;
+}
+
+#card-animation-container .card-cloud::before,
+#card-animation-container .card-cloud::after {
+    content: '';
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 100px;
+}
+
+#card-animation-container .card-cloud::before {
+    width: 20px;
+    height: 20px;
+    top: -10px;
+    left: 5px;
+}
+
+#card-animation-container .card-cloud::after {
+    width: 25px;
+    height: 8px;
+    top: -5px;
+    right: 5px;
+}
+
+/* Animation for drifting from left to right */
+@keyframes card-float-right {
+    0% {
+        transform: translateX(-50px); /* Start left, below card */
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateX(calc(100% + 50px)); /* End right, above card */
+        opacity: 0;
+    }
+}
+
+/* Animation for drifting from right to left */
+@keyframes card-float-left {
+    0% {
+        transform: translateX(calc(100% + 50px)); /* Start right, below card */
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateX(-50px); /* End left, above card */
+        opacity: 0;
+    }
+}

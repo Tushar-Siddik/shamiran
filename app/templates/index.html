@@ -82,8 +82,11 @@
                 </div>
             {% elif data.current %}
                 <!-- Current Weather Card -->
-                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 mb-8 shadow-xl text-white">
-                    <div class="flex items-center justify-between mb-4">
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 mb-8 shadow-xl text-white relative overflow-hidden">
+                    <!-- animation div -->
+                    <div id="card-animation-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+                    <div class="flex items-center justify-between mb-4 relative z-10">
                         <h2 class="text-3xl font-bold">
                             {{ data.current.name }}, {{ data.current.sys.country }}
                         </h2>
@@ -93,7 +96,7 @@
                         </button>
                         <!-- End: Favorite Toggle Button -->
                     </div>
-                    <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="flex flex-col md:flex-row items-center justify-between relative z-10">
                         <div>
                             <p class="text-6xl font-bold">{{ "%.1f"|format(data.current.main.temp) }}°C</p>
                             <p class="text-xl mt-2">{{ data.current.weather[0].description.title() }}</p>

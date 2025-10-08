@@ -131,11 +131,13 @@ document.addEventListener('DOMContentLoaded', function() {
             weatherContent.innerHTML = '';
             setWeatherTheme('clouds'); // Default to cloudy on error
             setWeatherAnimation('clouds'); // Set a default animation
+            setCardAnimation('clouds');
         } else if (data.current) {
             currentCity = data.current.name;
             const mainCondition = data.current.weather[0].main;
             setWeatherTheme(mainCondition); // Set weather class
             setWeatherAnimation(mainCondition);
+            setCardAnimation(mainCondition);
 
             // Update the sunrise/sunset times dynamically
             const sunriseEl = document.querySelector('p:has(.fa-sun)');
@@ -339,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof initialWeatherCondition !== 'undefined') {
         setWeatherTheme(initialWeatherCondition); // Set weather class
         setWeatherAnimation(initialWeatherCondition);
+        setCardAnimation(initialWeatherCondition);
 
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme); // Set mode class
@@ -474,7 +477,9 @@ function createClouds(count) {
 function createRainOrSnow(className, count, interval) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
-            createParticle(className);
+            // Pass a random duration to prevent the error
+            const duration = Math.random() * 1.5 + 0.5; // Between 0.5s and 2s
+            createCardParticle(className, duration); 
         }, Math.random() * 2000);
     }
 }
@@ -529,3 +534,128 @@ function startLightning() {
     }, 3000); // Check for lightning every 3 seconds
 }
 // --- End: Weather Animation Manager ---
+
+// --- Card Animation Manager ---
+const cardAnimationContainer = document.getElementById('card-animation-container');
+let cardAnimationInterval;
+
+function setCardAnimation(weatherCondition) {
+    // Clear any existing interval and particles
+    if (cardAnimationInterval) {
+        clearInterval(cardAnimationInterval);
+    }
+    while (cardAnimationContainer.firstChild) {
+        cardAnimationContainer.removeChild(cardAnimationContainer.firstChild);
+    }
+
+    const condition = weatherCondition.toLowerCase();
+    let particleClass = '';
+    let particleCount = 0;
+    let interval = 500; // Slower interval for the card
+
+    switch (condition) {
+        case 'clouds':
+        case 'mist':
+        case 'fog':
+        case 'haze':
+            particleClass = 'card-cloud';
+            particleCount = 3;
+            interval = 4000;
+            break;
+        case 'rain':
+        case 'drizzle':
+            particleClass = 'card-rain';
+            particleCount = 20;
+            interval = 300;
+            break;
+        case 'snow':
+            particleClass = 'card-snow';
+            particleCount = 15;
+            interval = 800;
+            break;
+        case 'thunderstorm':
+            particleClass = 'card-rain';
+            particleCount = 25;
+            interval = 200;
+            startCardLightning();
+            break;
+        default:
+            // For 'clear' or any other weather, do nothing
+            return;
+    }
+
+    // Start the perpetual animation
+    cardAnimationInterval = setInterval(() => {
+        if (cardAnimationContainer.children.length < particleCount) {
+            // FIX: Always provide a random duration
+            const animDuration = Math.random() * 2 + 1; // Between 1s and 3s
+            createCardParticle(particleClass, animDuration);
+        }
+    }, interval);
+}
+
+let lastCloudDirection = 'right'; // Start with 'right'
+
+function createCardParticle(className, duration = null) {
+    const particle = document.createElement('div');
+    
+    // For clouds, randomly choose a direction
+    // if (className === 'card-cloud') {
+    //     const isDriftingRight = Math.random() > 0.5;
+    //     particle.className = `weather-particle ${className} ${isDriftingRight ? 'float-right' : 'float-left'}`;
+    // } else {
+    //     particle.className = `weather-particle ${className}`;
+    // }
+    // For clouds, use the toggle to determine direction
+    if (className === 'card-cloud') {
+        // --- CHANGE THIS SECTION ---
+        if (lastCloudDirection === 'right') {
+            particle.className = `weather-particle ${className} float-left`;
+            lastCloudDirection = 'left';
+        } else {
+            particle.className = `weather-particle ${className} float-right`;
+            lastCloudDirection = 'right';
+        }
+    } else {
+        particle.className = `weather-particle ${className}`;
+    }
+    
+    const startX = Math.random() * cardAnimationContainer.offsetWidth;
+    particle.style.left = `${startX}px`;
+    particle.style.top = '20px';
+    
+    // Calculate duration once and use it
+    let animDuration = duration || (Math.random() * 15 + 20); // 20-35s for clouds
+    if (className !== 'card-cloud') {
+        animDuration = duration || (Math.random() * 2 + 1); // 1-3s for others
+    }
+    
+    particle.style.animationDuration = `${animDuration}s`;
+    
+    // Scale clouds randomly for variety
+    if (className === 'card-cloud') {
+        particle.style.transform = `scale(${Math.random() * 0.5 + 0.8})`;
+    }
+    
+    cardAnimationContainer.appendChild(particle);
+
+    // Remove particle after animation ends
+    const timeoutDuration = parseFloat(particle.style.animationDuration) * 1000;
+    setTimeout(() => {
+        if (particle.parentNode) {
+            particle.remove();
+        }
+    }, timeoutDuration);
+}
+
+function startCardLightning() {
+    // Use the same interval as the rain
+    setInterval(() => {
+        if (Math.random() > 0.9) { // 10% chance of lightning
+            const flash = document.createElement('div');
+            flash.className = 'thunderstorm-flash flash-animation';
+            cardAnimationContainer.appendChild(flash);
+            setTimeout(() => flash.remove(), 200);
+        }
+    }, 2000);
+}
