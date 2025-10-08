@@ -71,4 +71,5 @@ instance/
 .webassets-cache
 
 # Others
+cache/
 shamiran.ipynb

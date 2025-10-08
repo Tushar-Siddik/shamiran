@@ -90,11 +90,16 @@
                         <h2 class="text-3xl font-bold">
                             {{ data.current.name }}, {{ data.current.sys.country }}
                         </h2>
-                        <!-- Favorite Toggle Button -->
-                        <button id="favorite-btn" class="text-3xl hover:scale-110 transition-transform" title="Add to Favorites">
-                            <i class="far fa-star"></i>
-                        </button>
-                        <!-- End: Favorite Toggle Button -->
+                        <div class="flex items-center gap-3">
+                            <!-- Map Toggle Button -->
+                            <button id="map-toggle-btn" class="text-2xl hover:scale-110 transition-transform" title="Toggle Map">
+                                <i class="fas fa-map"></i>
+                            </button>
+                            <!-- Favorite Toggle Button -->
+                            <button id="favorite-btn" class="text-3xl hover:scale-110 transition-transform" title="Add to Favorites">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="flex flex-col md:flex-row items-center justify-between relative z-10">
                         <div>
@@ -114,6 +119,20 @@
                     </div>
                 </div>
                 <!-- End: Current Weather Card -->
+
+                <!-- Map Card (Initially Hidden) -->
+                {% if data.current and data.current.coord %}
+                <div id="map-card" class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">Interactive Weather Map</h3>
+                        <button id="close-map-btn" class="text-white/70 hover:text-white transition-colors">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="weather-map" class="w-full h-96 rounded-lg overflow-hidden shadow-inner"></div>
+                </div>
+                <!-- REMOVE THE OLD SCRIPT THAT AUTO-INITIALIZES THE MAP -->
+                {% endif %}
 
                 <!-- Hourly Forecast -->
                 <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-xl text-white">
@@ -258,34 +277,7 @@
                     </div>
                 </div>
                 {% endif %}
-                <!-- End: Moon Phase Card -->
-
-                <!-- Map Card -->
-                {% if data.current and data.current.coord %}
-                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-8 shadow-xl text-white">
-                    <h3 class="text-xl font-bold mb-4">Interactive Weather Map</h3>
-                    <div id="weather-map" class="w-full h-96 rounded-lg overflow-hidden shadow-inner"></div>
-                </div>
-
-                <!-- This script calls the function and passes the required data -->
-                <script>
-                    // Wait until the initial HTML document has been completely loaded
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Check if the Leaflet library loaded and the map container exists
-                        if (typeof L !== 'undefined' && document.getElementById('weather-map') && typeof initializeMap === 'function') {
-                            initializeMap(
-                                {{ data.current.coord.lat }}, 
-                                {{ data.current.coord.lon }}, 
-                                "{{ data.current.name }}",
-                                "{{ config.API_KEY }}" // This will now work!
-                            );
-                        } else {
-                            console.error("Could not initialize map. Check if Leaflet is loaded and the initializeMap function exists.");
-                        }
-                    });
-                </script>
-                {% endif %}
-                
+                <!-- End: Moon Phase Card -->                
             {% endif %}
         </div>
         <!-- End: Weather Display -->
@@ -295,6 +287,14 @@
 
 {% block scripts %}
 <script>
+    // Pass template data to JavaScript
+    window.mapData = {
+        lat: {{ data.current.coord.lat if data.current and data.current.coord else 'null' }},
+        lon: {{ data.current.coord.lon if data.current and data.current.coord else 'null' }},
+        cityName: "{{ data.current.name if data.current else '' }}",
+        apiKey: "{{ config.API_KEY }}"
+    };
+    
     var initialWeatherCondition = "{{ initial_condition }}";
     // Pass the current city name to JS
     var initialCityName = "{{ data.current.name if data.current else default_city }}";

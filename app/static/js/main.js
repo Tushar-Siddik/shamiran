@@ -256,6 +256,88 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Map toggle functionality
+    const mapToggleBtn = document.getElementById('map-toggle-btn');
+    const mapCard = document.getElementById('map-card');
+    const closeMapBtn = document.getElementById('close-map-btn');
+    let mapInitialized = false;
+    
+    // Store map data globally for later use
+    // window.mapData = {
+    //     lat: {{ data.current.coord.lat if data.current and data.current.coord else 'null' }},
+    //     lon: {{ data.current.coord.lon if data.current and data.current.coord else 'null' }},
+    //     cityName: "{{ data.current.name if data.current else '' }}",
+    //     apiKey: "{{ config.API_KEY }}"
+    // };
+
+    if (!window.mapData) {
+        window.mapData = {
+            lat: null,
+            lon: null,
+            cityName: '',
+            apiKey: ''
+        };
+    }
+        
+    if (mapToggleBtn && mapCard) {
+        mapToggleBtn.addEventListener('click', function() {
+            toggleMap();
+        });
+        
+        if (closeMapBtn) {
+            closeMapBtn.addEventListener('click', function() {
+                hideMap();
+            });
+        }
+    }
+    
+    function toggleMap() {
+        if (mapCard.classList.contains('hidden')) {
+            showMap();
+        } else {
+            hideMap();
+        }
+    }
+    
+    function showMap() {
+        mapCard.classList.remove('hidden');
+        mapToggleBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i>';
+        mapToggleBtn.title = 'Hide Map';
+        
+        // Initialize map only when first shown
+        if (!mapInitialized && window.mapData.lat && window.mapData.lon) {
+            // Use a small delay to ensure the container is visible before initializing
+            setTimeout(() => {
+                initializeMap(
+                    window.mapData.lat, 
+                    window.mapData.lon, 
+                    window.mapData.cityName,
+                    window.mapData.apiKey
+                );
+                mapInitialized = true;
+            }, 100);
+        } else if (!window.mapData.lat || !window.mapData.lon) {
+            console.error("Map data is not available");
+            // Optionally show an error message to the user
+            const mapContainer = document.getElementById('weather-map');
+            if (mapContainer) {
+                mapContainer.innerHTML = '<div class="flex justify-center items-center h-full"><p class="text-white">Map data is not available for this location.</p></div>';
+            }
+        }
+        
+        // Smooth scroll to map
+        setTimeout(() => {
+            mapCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 200);
+    }
+    
+    function hideMap() {
+        mapCard.classList.add('hidden');
+        mapToggleBtn.innerHTML = '<i class="fas fa-map"></i>';
+        mapToggleBtn.title = 'Show Map';
+    }
+
+
     // --- Weather Fetching ---
     function fetchWeatherForCity(city) {
         cityInput.value = city;
@@ -358,26 +440,34 @@ const mapContainer = document.getElementById('weather-map');
 let map = null; // To hold the map instance
 
 function initializeMap(lat, lon, cityName, apiKey) {
+    // Check if the map container exists
+    const mapContainer = document.getElementById('weather-map');
     if (!mapContainer) {
         console.error("Map container not found!");
         return;
     }
 
-    console.log("Initializing map for:", cityName, lat, lon); // Debugging log
+    // Validate coordinates
+    if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+        console.error("Invalid coordinates for map initialization");
+        return;
+    }
+
+    console.log("Initializing map for:", cityName, lat, lon);
 
     // If a map already exists, remove it
-    if (map) {
-        map.remove();
+    if (window.map) {
+        window.map.remove();
     }
 
     // Initialize the map, centered on the city
-    map = L.map('weather-map').setView([lat, lon], 10);
+    window.map = L.map('weather-map').setView([lat, lon], 10);
 
-    // Add the OpenStreetMap tiles (NO API key needed here)
+    // Add the OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    }).addTo(window.map);
 
     // Create a custom icon for the marker
     const weatherIcon = L.divIcon({
@@ -388,11 +478,11 @@ function initializeMap(lat, lon, cityName, apiKey) {
 
     // Add a marker for the city
     L.marker([lat, lon], { icon: weatherIcon })
-        .addTo(map)
+        .addTo(window.map)
         .bindPopup(`<strong>${cityName}</strong>`)
         .openPopup();
         
-    // Add weather radar layer (API key IS needed here)
+    // Add weather radar layer
     const radarUrl = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`;
     const radarLayer = L.tileLayer(radarUrl, {
         maxZoom: 19,
@@ -405,7 +495,7 @@ function initializeMap(lat, lon, cityName, apiKey) {
         "Precipitation Radar": radarLayer
     };
 
-    L.control.layers(null, overlayMaps).addTo(map);
+    L.control.layers(null, overlayMaps).addTo(window.map);
 }
 // --- End: Map Integration ---
 

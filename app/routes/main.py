@@ -30,11 +30,12 @@ def index():
 
     context = {
         'data': data, 
-        'default_city': city_name_from_api, 
+        'default_city': city_name_from_api,
         'initial_condition': initial_condition,
         'sunrise_time': sunrise_time,
         'sunset_time': sunset_time,
-        'config': {'API_KEY': os.environ.get('API_KEY')}
+        'config': {'API_KEY': os.environ.get('API_KEY')},
+        'show_map': False  # Default to hidden
     }
     return render_template('index.html', **context)
 
@@ -87,7 +88,8 @@ def get_weather():
         'initial_condition': initial_condition,
         'sunrise_time': sunrise_time,
         'sunset_time': sunset_time,
-        'config': {'API_KEY': os.environ.get('API_KEY')}
+        'config': {'API_KEY': os.environ.get('API_KEY')},
+        'show_map': False  # Default to hidden
     }
     return render_template('index.html', **context)
 
@@ -140,7 +142,8 @@ def weather_by_coords():
         'initial_condition': initial_condition,
         'sunrise_time': sunrise_time,
         'sunset_time': sunset_time,
-        'config': {'API_KEY': os.environ.get('API_KEY')}
+        'config': {'API_KEY': os.environ.get('API_KEY')},
+        'show_map': False  # Default to hidden
     }
     return render_template('index.html', **context)
     

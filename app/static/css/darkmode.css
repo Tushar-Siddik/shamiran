@@ -215,6 +215,74 @@ button#geo-btn, #favorite-btn {
     line-height: 30px; /* Match iconSize height */
 }
 
+
+/* Map Toggle Button */
+#map-toggle-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--text-primary);
+    transition: transform 0.2s ease, color 0.2s ease;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+#map-toggle-btn:hover {
+    transform: scale(1.1);
+    color: var(--text-secondary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Map Card */
+#map-card {
+    transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#map-card:not(.hidden) {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+/* Map Toggle Button */
+#map-toggle-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--text-primary);
+    transition: transform 0.2s ease, color 0.2s ease;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+#map-toggle-btn:hover {
+    transform: scale(1.1);
+    color: var(--text-secondary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Close Map Button */
+#close-map-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+#close-map-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+
 /* --- Smart Moon Phase Graphics --- */
 .moon-phase-graphic {
     width: 120px;
