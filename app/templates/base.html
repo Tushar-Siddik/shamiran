@@ -3,14 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Shamiran - সমীরণ{% endblock %}</title>
     
+    <!-- 1. SEO & Basic Meta Tags -->
+    <title>{% block title %}Shamiran: Real-time Weather for Bangladesh | AQI, UV & Forecasts{% endblock %}</title>
+    <meta name="description" content="Get accurate, real-time weather forecasts for Bangladesh with Shamiran. Features include AQI, UV index, moon phases, and a beautiful, responsive design.">
+    <meta name="keywords" content="weather, bangladesh, forecast, dhaka, chittagong, shamiran, aqi, air quality, uv index, temperature, rain, flask app">
+    <meta name="author" content="Md. Siddiqur Rahman">
+    <meta name="robots" content="index, follow">
+
+    <!-- 2. Open Graph / Facebook Meta Tags for Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="Shamiran: Real-time Weather for Bangladesh">
+    <meta property="og:description" content="Get accurate, real-time weather forecasts for Bangladesh with Shamiran. Features include AQI, UV index, moon phases, and a beautiful, responsive design.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/shamiran-og-image.png') }}">
+    <meta property="og:site_name" content="Shamiran">
+
+    <!-- 3. Twitter Card Meta Tags for Social Sharing -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="Shamiran: Real-time Weather for Bangladesh">
+    <meta property="twitter:description" content="Get accurate, real-time weather forecasts for Bangladesh with Shamiran. Features include AQI, UV index, moon phases, and a beautiful, responsive design.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/shamiran-og-image.png') }}">
+    <!-- <meta property="twitter:site" content="@shamiran_app"> --> <!-- ACTION: Uncomment and change if you have a Twitter handle -->
+
+    <!-- 4. Favicon & Theme Color -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- <meta name="theme-color" content="#2F80ED"> This colors the browser UI on mobile -->
+
     <!-- Theme Script to prevent flash -->
     <script>
         (function() {
             const theme = localStorage.getItem('theme') || 'light';
             const condition = "{{ initialWeatherCondition or 'Clear' }}".toLowerCase();
-            // Apply both weather and mode classes to the body
             document.body.className = `weather-${condition} ${theme}-mode min-h-screen transition-all duration-1000`;
         })();
     </script>
@@ -20,8 +45,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> -->
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
     <style>
@@ -50,6 +73,19 @@
         <main>
             {% block content %}{% endblock %}
         </main>
+        <!-- Footer -->
+        <footer class="text-center py-6 mt-12">
+            <p class="text-white/80 text-sm">
+                Created with ❤️ by 
+                <a href="https://github.com/Tushar-Siddik/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white transition-colors duration-300">
+                    <i class="fab fa-github"></i> Md. Siddiqur Rahman
+                </a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="https://linkedin.com/in/tushar-siddik/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white transition-colors duration-300">
+                    <i class="fab fa-linkedin"></i> LinkedIn
+                </a>
+            </p>
+        </footer>
     </div>
     <!-- Leaflet JavaScript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
